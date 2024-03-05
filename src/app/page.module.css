@@ -1,0 +1,70 @@
+.main {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 1fr auto 1fr;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  margin: 20px;
+  border-radius: 50px;
+}
+
+.mainDiv {
+  display: grid;
+  grid-column: 2;
+  grid-row: 2;
+  grid-template-rows: 1fr auto auto 1fr;
+}
+
+.header {
+  display: grid;
+  grid-row: 2;
+  grid-template-columns: 1fr auto 1fr;
+  font-size: 70px;
+  background-color: skyblue;
+  color: black;
+  border-radius: 20px;
+  margin: 0 0 5px 0;
+}
+
+.title {
+  display: grid;
+  grid-column: 2;
+  font-size: 70px;
+  color: black;
+
+}
+
+.hidden {
+  display: none;
+}
+
+.canvas {
+  display: grid;
+  grid-row: 3;
+  grid-template-rows: 1fr auto auto 1fr;
+}
+
+.canvas canvas {
+  display: grid;
+  grid-row: 2;
+  border-radius: 20px;
+}
+
+.canvas div {
+  display: grid;
+  grid-row: 3;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.canvas div p {
+  display: grid;
+  grid-column: 2;
+  font-size: 30px;
+  color: black;
+  margin: 5px;
+  background-color: skyblue;
+  border-radius: 5px;
+  padding: 5px;
+}
