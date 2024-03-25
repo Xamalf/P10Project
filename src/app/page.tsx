@@ -77,8 +77,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <div className={styles.mainDiv}>
-        <div className={styles.header}>
+        <div className={styles.titleDiv}>
           <header className={styles.title}>Hand Recognition</header>
         </div>
         <div className={styles.hidden}>
@@ -86,12 +85,8 @@ export default function Home() {
         </div>
         <div className={styles.canvas}>
             <canvas ref={frameCanvas} width={cameraSettings.width} height={cameraSettings.height}/>
-            <div>            
-              <p ref={text}></p>
-            </div>
-
+            <p ref={text}>None</p>
         </div>
-      </div>
     </main>
   );
 }
