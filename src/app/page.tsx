@@ -2,9 +2,16 @@
 
 import styles from "./page.module.css";
 import * as MPHands from "@mediapipe/tasks-vision";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Camera } from "@mediapipe/camera_utils";
-import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
+import { drawLandmarks } from "@mediapipe/drawing_utils";
+
+
+type pointerStyle = {
+  display: string,
+  left: string,
+  top: string,
+}
 
 export default function Home() {
   const frame = useRef<any>(null);
@@ -13,6 +20,9 @@ export default function Home() {
   const grec = useRef<MPHands.GestureRecognizer|null>(null);
   const frameCanvas = useRef<HTMLCanvasElement>(null);
   const text = useRef<HTMLParagraphElement>(null);
+  const [num, setNum] = useState<number>(1);
+  const [showVid, setShowVid] = useState<boolean>(false);
+  const [pointerStyles, setPointerStyles] = useState<pointerStyle>({display: 'none', left: '0%', top: '0%'});
 
   const cameraSettings = {
     width: 1280,
@@ -33,6 +43,8 @@ export default function Home() {
     let results: MPHands.GestureRecognizerResult|undefined = grec.current?.recognize(frame.current)
 
     if (results) {
+      console.log(results)
+
       if (frameCanvas.current) { 
         if (results.landmarks) {
           results.landmarks.forEach((landmarks) => {
@@ -42,9 +54,21 @@ export default function Home() {
         }
   
         results.gestures.forEach((test) => {
+          console.log(test)
           text.current!.innerText = test[0].categoryName;
           console.log(test[0].categoryName);
         })
+
+        if (results.gestures[0] && results.gestures[0][0].categoryName === 'FistThumbExt') {
+          var point = results.landmarks[0][4];  
+          setPointerStyles({display: 'block', left: (100-Math.round(point.x*100)).toString() + '%', top: (Math.round(point.y*100)).toString() + '%'});
+          localStorage.setItem('pointer', JSON.stringify({display: 'block', left: (100-Math.round(point.x*100)).toString() + '%', top: (Math.round(point.y*100)).toString() + '%'}));
+          console.log(pointerStyles)
+        }
+        else {
+          setPointerStyles({display: 'none', left: '0%', top: '0%'});
+        }
+
         canvas.restore();
     }
     }
@@ -55,17 +79,41 @@ export default function Home() {
       "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
 
     grec.current = await MPHands.GestureRecognizer.createFromOptions(vision.current, {
-      numHands: 1,
+      numHands: 2,
       baseOptions: {
-        modelAssetPath: "https://storage.googleapis.com/mediapipe-tasks/gesture_recognizer/gesture_recognizer.task",
+        modelAssetPath: "./gesture_recognizer.task",
         delegate: "GPU",
       },
     });
 
-    grec.current.setOptions({ runningMode: "IMAGE" })
+    grec.current.setOptions({ runningMode: "IMAGE", numHands: 2 })
+  }
+
+  async function newNumber1() {
+    var newNum: number = num - 1;
+    setNum(newNum);
+    localStorage.setItem('slide', newNum.toString());
+  }
+
+  async function newNumber2() {
+    var newNum: number = num + 1;
+    setNum(newNum);
+    localStorage.setItem('slide', newNum.toString());
+  }
+  async function toggleVid() {
+    var newShowVid: boolean = !showVid;
+    setShowVid(newShowVid);
+    localStorage.setItem('showVideo', newShowVid.toString());
+    console.log(newShowVid.toString())
+  }
+
+  async function getStoredItems() {
+    setNum(parseInt(localStorage.getItem('slide') ?? "1") ?? 1);
+    setShowVid(localStorage.getItem('showVideo') === "true");
   }
 
   useEffect( () => {
+    getStoredItems();
     setupCamera();
     setupHands();
   }, []);
@@ -77,8 +125,10 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
+        <div className={styles.pointer} style={pointerStyles} />
         <div className={styles.titleDiv}>
           <header className={styles.title}>Hand Recognition</header>
+          <a href="/presentation" target="_blank">Open</a>
         </div>
         <div className={styles.hidden}>
           <video style={{ display: 'none' }} playsInline ref={frame}/>
@@ -86,6 +136,9 @@ export default function Home() {
         <div className={styles.canvas}>
             <canvas ref={frameCanvas} width={cameraSettings.width} height={cameraSettings.height}/>
             <p ref={text}>None</p>
+            <button onClick={newNumber1}>prev</button>
+            <button onClick={newNumber2}>next</button>
+            <button onClick={toggleVid}>toggleVid</button>
         </div>
     </main>
   );

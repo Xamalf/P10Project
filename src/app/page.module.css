@@ -57,6 +57,7 @@
   border-radius: 20px;
   object-fit: cover;
   object-position: center;
+  transform: scaleX(-1);
 }
 
 .canvas p {
@@ -67,4 +68,14 @@
   color: rgb(05, 50, 0);
   background-color: skyblue;
   border-radius: 5px;
+}
+
+.pointer {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  padding: 1%;
+  color: rgb(05, 50, 0);
+  background-color: red;
+  border-radius: 100%;
 }
