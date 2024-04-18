@@ -22,6 +22,7 @@ export default function Home() {
   const text = useRef<HTMLParagraphElement>(null);
   const [num, setNum] = useState<number>(1);
   const [showVid, setShowVid] = useState<boolean>(false);
+  const [presentationMode, setPresentationMode] = useState<boolean>(false);
   const [pointerStyles, setPointerStyles] = useState<pointerStyle>({display: 'none', left: '0%', top: '0%'});
 
   const cameraSettings = {
@@ -100,11 +101,19 @@ export default function Home() {
     setNum(newNum);
     localStorage.setItem('slide', newNum.toString());
   }
+
   async function toggleVid() {
     var newShowVid: boolean = !showVid;
     setShowVid(newShowVid);
     localStorage.setItem('showVideo', newShowVid.toString());
     console.log(newShowVid.toString())
+  }
+
+  async function toggleMode() {
+    var newPresentationMode: boolean = !presentationMode;
+    setPresentationMode(newPresentationMode);
+    localStorage.setItem('presentationMode', newPresentationMode.toString());
+    console.log(newPresentationMode.toString())
   }
 
   async function getStoredItems() {
@@ -139,6 +148,7 @@ export default function Home() {
             <button onClick={newNumber1}>prev</button>
             <button onClick={newNumber2}>next</button>
             <button onClick={toggleVid}>toggleVid</button>
+            <button onClick={toggleMode}>toggleMode</button>
         </div>
     </main>
   );
