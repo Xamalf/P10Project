@@ -5,6 +5,8 @@ import * as MPHands from "@mediapipe/tasks-vision";
 import { useEffect, useRef, useState } from "react";
 import { Camera } from "@mediapipe/camera_utils";
 import { drawLandmarks } from "@mediapipe/drawing_utils";
+import { handPoseMachine } from './handPoseMachine';
+import { useMachine } from '@xstate/react';
 
 
 type pointerStyle = {
@@ -23,6 +25,7 @@ export default function Home() {
   const [num, setNum] = useState<number>(1);
   const [showVid, setShowVid] = useState<boolean>(false);
   const [pointerStyles, setPointerStyles] = useState<pointerStyle>({display: 'none', left: '0%', top: '0%'});
+  const [state, send] = useMachine(handPoseMachine);
 
   const cameraSettings = {
     width: 1280,
@@ -53,21 +56,53 @@ export default function Home() {
   
         }
   
-        results.gestures.forEach((test) => {
-          console.log(test)
-          text.current!.innerText = test[0].categoryName;
-          console.log(test[0].categoryName);
-        })
+        results.gestures.forEach((gesture) => {
+          console.log(gesture)
+          text.current!.innerText = gesture[0].categoryName;
+          console.log(gesture[0].categoryName);
 
-        if (results.gestures[0] && results.gestures[0][0].categoryName === 'FistThumbExt') {
-          var point = results.landmarks[0][4];  
-          setPointerStyles({display: 'block', left: (100-Math.round(point.x*100)).toString() + '%', top: (Math.round(point.y*100)).toString() + '%'});
-          localStorage.setItem('pointer', JSON.stringify({display: 'block', left: (100-Math.round(point.x*100)).toString() + '%', top: (Math.round(point.y*100)).toString() + '%'}));
-          console.log(pointerStyles)
-        }
-        else {
-          setPointerStyles({display: 'none', left: '0%', top: '0%'});
-        }
+          switch(gesture[0].categoryName) {
+            case 'PalmTildedLeft':
+              send({type: 'PalmTildedLeft'});
+              break;
+            case 'PalmTildedRight':
+              send({type: 'PalmTildedRight'});
+              break;
+            case 'PalmUp':
+              send({type: 'PalmUp'});
+              break;
+            case 'FistThumbExt':
+              send({type: 'enablePointer'});
+              break;
+            case '2FingersExt':
+              send({type: '2FingersExt'});
+              break;
+            case '3FingersExt':
+              send({type: '3FingersExt'});
+              break;
+            case '4FingersExt':
+              send({type: '4FingersExt'});
+              break;
+            case '5FingersExt':
+              send({type: '5FingersExt'});
+              break;
+            case 'Pointing':
+              send({type: 'Pointing'});
+              break;
+            case 'TwoFingersSide':
+              send({type: 'TwoFingersSide'});
+              break;
+            case 'TwoFingersUp':
+              send({type: 'TwoFingersUp'});
+              break;
+            case 'none':
+            send({type: 'NONE'});
+            break;
+            default:
+              send({type: 'NONE'});
+              break;
+          }
+        })
 
         canvas.restore();
     }
