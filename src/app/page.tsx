@@ -21,13 +21,16 @@ export default function Home() {
   const vision = useRef<any>(null);
   const grec = useRef<MPHands.GestureRecognizer|null>(null);
   const frameCanvas = useRef<HTMLCanvasElement>(null);
-  const text = useRef<HTMLParagraphElement>(null);
+  const text1 = useRef<HTMLParagraphElement>(null);
+  const text2 = useRef<HTMLParagraphElement>(null);
   const [num, setNum] = useState<number>(1);
   const [showVid, setShowVid] = useState<boolean>(false);
   const [presentationMode, setPresentationMode] = useState<boolean>(false);
   const [pointerStyles, setPointerStyles] = useState<pointerStyle>({display: 'none', left: '0%', top: '0%'});
   const [state, send] = useMachine(handPoseMachine);
-
+  const [gestureHistory1stHand, setGestureHistory1stHand] = useState<string[]>(["", "", "", "", ""]);
+  const [gestureHistory2ndHand, setGestureHistory2ndHand] = useState<string[]>(["", "", "", "", ""]);
+  const [previousGesture, setPreviousGesture] = useState<string>("none");
   const cameraSettings = {
     width: 1280,
     height: 720,
@@ -44,10 +47,12 @@ export default function Home() {
     canvas.clearRect(0, 0, 1280, 720);
     canvas.drawImage(frame.current, 0, 0, 1280, 720);
 
-    let results: MPHands.GestureRecognizerResult|undefined = grec.current?.recognize(frame.current)
+    let results: MPHands.GestureRecognizerResult|undefined = grec.current?.recognizeForVideo(frame.current, Date.now());
 
     if (results) {
-      console.log(results)
+      //console.log(results)
+
+      let isFirst = true;
 
       if (frameCanvas.current) { 
         if (results.landmarks) {
@@ -56,18 +61,43 @@ export default function Home() {
           })
   
         }
-  
-        results.gestures.forEach((gesture) => {
-          console.log(gesture)
-          text.current!.innerText = gesture[0].categoryName;
-          console.log(gesture[0].categoryName);
 
-          switch(gesture[0].categoryName) {
-            case 'PalmTildedLeft':
-              send({type: 'PalmTildedLeft'});
-              break;
-            case 'PalmTildedRight':
-              send({type: 'PalmTildedRight'});
+        results.gestures.forEach((gesture) => {
+          if(isFirst) {
+            let gestureHistory = gestureHistory1stHand;
+            gestureHistory.shift();
+
+            gestureHistory.push(gesture[0].categoryName);
+
+            //console.log(gestureHistory);
+
+            //console.log(gestureHistory1stHand);
+            //console.log("-------");
+
+            setGestureHistory1stHand(gestureHistory);
+            isFirst = false;
+          } else {
+            const [firstGesture, ...restOfGestureHistory ] = gestureHistory2ndHand;
+            setGestureHistory2ndHand([...restOfGestureHistory, gesture[0].categoryName]);
+          }
+
+          //console.log(gesture)
+          text1.current!.innerText = gesture[0].categoryName;
+          text2.current!.innerText = gesture[0].categoryName;
+          //console.log(gesture[0].categoryName);
+
+
+        })
+        let newGesture = gestureHistory1stHand.filter((gesture) => gesture === gestureHistory1stHand[4]).length > 2 ? gestureHistory1stHand[4] : "none";
+
+        if(newGesture !== null && newGesture !== "" && newGesture !== "none" && newGesture !== previousGesture) {
+          setPreviousGesture(newGesture);
+          console.log(`new gesture is: ${newGesture}`);
+
+
+          switch(newGesture) {
+            case 'PalmTilded':
+              send({type: 'PalmTilded', context: {num: num, setNum: setNum}});
               break;
             case 'PalmUp':
               send({type: 'PalmUp'});
@@ -96,6 +126,12 @@ export default function Home() {
             case 'TwoFingersUp':
               send({type: 'TwoFingersUp'});
               break;
+            case 'ThumbsUp':
+              send({type: 'ThumbsUp', context: {num: num, setNum: setNum}});
+              break;
+            case 'ThumbsDown':
+              send({type: 'ThumbsDown'});
+              break;
             case 'none':
             send({type: 'NONE'});
             break;
@@ -103,8 +139,7 @@ export default function Home() {
               send({type: 'NONE'});
               break;
           }
-        })
-
+        }
         canvas.restore();
     }
     }
@@ -122,7 +157,7 @@ export default function Home() {
       },
     });
 
-    grec.current.setOptions({ runningMode: "IMAGE", numHands: 2 })
+    grec.current.setOptions({ runningMode: "VIDEO", numHands: 2, customGesturesClassifierOptions: {scoreThreshold: 0.8} })
   }
 
   async function prevSlide() {
@@ -177,14 +212,15 @@ export default function Home() {
         <div className={styles.hidden}>
           <video style={{ display: 'none' }} playsInline ref={frame}/>
         </div>
-        <div className={styles.canvas}>
-            <canvas ref={frameCanvas} width={cameraSettings.width} height={cameraSettings.height}/>
-            <p ref={text}>None</p>
-            <button onClick={prevSlide}>prev</button>
-            <button onClick={nextSlide}>next</button>
-            <button onClick={toggleVid}>toggleVid</button>
-            <button onClick={toggleMode}>toggleMode</button>
-        </div>
+      <div className={styles.canvas}>
+        <canvas ref={frameCanvas} width={cameraSettings.width} height={cameraSettings.height}/>
+        <p ref={text1}>None</p>
+        <p ref={text2}>None</p>
+        <button onClick={prevSlide}>prev</button>
+        <button onClick={nextSlide}>next</button>
+        <button onClick={toggleVid}>toggleVid</button>
+        <button onClick={toggleMode}>toggleMode</button>
+      </div>
     </main>
   );
 }

@@ -5,14 +5,13 @@ export const handPoseMachine = createMachine({
   initial: 'q_off',
   states: {
     q_off: {
+      entry: ['machine_disabled'],
       on: {
         ThumbsUp: 'q_turnon'
-      },
-      after: {
-          2000: { target: 'q_off' }
       }
     },
     q_turnon: {
+      entry: ['q_turn_on'],
       on: {
         ThumbsDown: 'q_slide'
       },
@@ -21,6 +20,7 @@ export const handPoseMachine = createMachine({
       }
     },
     q_slide: {
+      entry: ['machine_enabled'],
       on: {
           ThumbsUp: 'q_turndown',
           TwoFingersUp: 'q_tovideo',
@@ -291,11 +291,27 @@ export const handPoseMachine = createMachine({
             },
 
             goToPrevSlide: (context, event) => {
-                console.log('Go to previous slide')
+                //console.log(context);
+
+                //var newNum: number = context.num - 1;
+                //context.setNum(newNum);
+                //localStorage.setItem('slide', newNum.toString());
             },
 
             enablePointer: (context, event) => {
                 console.log('Enable pointer')
+            },
+
+            machine_enabled: (context, event) => {
+                console.log('Machine enabled');
+                console.log(context);
+            },
+
+            machine_disabled: (context, event) => {
+                console.log('Machine disabled');
+            },
+            q_turn_on: (context, event) => {
+                console.log('Turn on');
             }
         }
     }
