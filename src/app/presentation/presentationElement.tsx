@@ -1,5 +1,4 @@
 "use client";
-import styles from "./setupView.module.css";
 import { Document, Page } from "react-pdf";
 import { pdfjs } from 'react-pdf';
 
@@ -7,9 +6,9 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 export default function PresentationElement(props: any) {
   return (
-    <div className={styles.presentationElement}>   
+    <div className={props.styles}>   
       {props.pdf ? <Document file={props.pdf}>
-      <Page pageNumber={props.page??1} renderTextLayer={false} renderAnnotationLayer={false} />
+      <Page pageNumber={props.page??1} renderTextLayer={false} renderAnnotationLayer={false} canvasBackground="transparent" width={4096}/>
       </Document> : <p style={{color: "white"}}>No PDF</p>}
     </div>
   );
