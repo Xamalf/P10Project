@@ -125,13 +125,13 @@ export default function Home() {
     grec.current.setOptions({ runningMode: "IMAGE", numHands: 2 })
   }
 
-  async function newNumber1() {
+  async function prevSlide() {
     var newNum: number = num - 1;
     setNum(newNum);
     localStorage.setItem('slide', newNum.toString());
   }
 
-  async function newNumber2() {
+  async function nextSlide() {
     var newNum: number = num + 1;
     setNum(newNum);
     localStorage.setItem('slide', newNum.toString());
@@ -180,8 +180,8 @@ export default function Home() {
         <div className={styles.canvas}>
             <canvas ref={frameCanvas} width={cameraSettings.width} height={cameraSettings.height}/>
             <p ref={text}>None</p>
-            <button onClick={newNumber1}>prev</button>
-            <button onClick={newNumber2}>next</button>
+            <button onClick={prevSlide}>prev</button>
+            <button onClick={nextSlide}>next</button>
             <button onClick={toggleVid}>toggleVid</button>
             <button onClick={toggleMode}>toggleMode</button>
         </div>

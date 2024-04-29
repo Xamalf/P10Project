@@ -1,12 +1,28 @@
 "use client";
-import styles from "./setupView.module.css";
+import { useRef, useImperativeHandle, forwardRef } from "react";
 
-export default function VideoElement(props: any) {
+const VideoElement = forwardRef((props: any, ref) => {
+  const video = useRef<HTMLVideoElement|null>(null);
+
+    useImperativeHandle(ref, () => ({
+      play() {
+        video.current!.play();
+      },
+      pause() {
+        video.current!.pause();
+      },
+      time(t: number){
+        video.current!.currentTime = t;
+      }
+    }));
+
   return (
-      <div className={styles.videoElement}>     
+      <div className={props.styles}>     
       {props.video 
-      ? <video controls><source src={props.video} type="video/mp4"/></video> 
+      ? <video ref={video} controls={props.controls??false}><source src={props.video} type="video/mp4"/></video> 
       : <p style={{color: "white"}}>No Video</p>}
       </div>
   );
-}
+});
+
+export default VideoElement;

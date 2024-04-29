@@ -1,15 +1,43 @@
 "use client";
-import styles from "./page.module.css";
+import styles from "./presentationView.module.css";
 import VideoElement from "./videoElement"
 import PresentationElement from "./presentationElement";
+import { useRef, useEffect } from "react";
 
-export default function PresentationView(props: any) { 
+export default function PresentationView(props: any) {
+  const video = useRef<any>(null);
+
+  const play = () => { console.log("play"); video.current && video.current.play() }
+  const pause = () => { console.log("pause"); video.current && video.current.pause() }
+  const time = (e: any) => { console.log("pause"); video.current && video.current.time(e.detail); }
+
+
+  function addEventListeners() {
+    document.addEventListener('play', play);
+    document.addEventListener('pause', pause);
+    document.addEventListener('time', time);
+  }
+
+  function removeEventListeners() {
+    document.removeEventListener('play', play);
+    document.removeEventListener('pause', pause);
+    document.removeEventListener('time', time);
+  }
+
+  useEffect( () => {
+    addEventListeners();
+
+    return () => {
+      removeEventListeners()
+    }
+  }, []);
+
   return (
-    <div>
+    <div className={styles.main}>
       <div className={styles.pointer} style={props.pointerStyles} />
       {props.showVideo 
-      ? <VideoElement video={props.video}/>
-      : <PresentationElement pdf={props.pdf} page={props.page}/>
+      ? <VideoElement ref={video} video={props.video} styles={styles.videoElement}/>
+      : <PresentationElement pdf={props.pdf} page={props.page} styles={styles.presentationElement}/>
       }
     </div>
   );
