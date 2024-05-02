@@ -30,7 +30,7 @@ export const handPoseMachineConfig = {
     q_slide: {
       entry: ['presentationMode'],
       on: {
-          ThumbsUp: 'q_turndown',
+          ThumbsUp: 'q_turnoff',
           TwoFingersUp: 'q_tovideo',
           thumbs_together: 'q_cs1',
           PalmTildedRight: 'q_next1',
@@ -120,8 +120,11 @@ export const handPoseMachineConfig = {
 
 
     q_pointer1: {
+      entry: ['enablePointer'],
+
       on: {
-          Fist: 'q_slide'
+          Fist: 'q_slide',
+          Pointing: 'q_pointer1'
       }
     },
 

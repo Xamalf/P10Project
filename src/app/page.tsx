@@ -27,10 +27,11 @@ export default function Home() {
   const [num, setNum] = useState<number>(1);
   const [showVid, setShowVid] = useState<boolean>(false);
   const [presentationMode, setPresentationMode] = useState<boolean>(false);
-  const [pointerStyles, setPointerStyles] = useState<pointerStyle>({display: 'none', left: '0%', top: '0%'});
+  const pointerStyles = useRef<pointerStyle>({display: 'none', left: '0%', top: '0%'});
   const [gestureHistory1stHand, setGestureHistory1stHand] = useState<string[]>(["none", "none", "none", "none", "none"]);
   const [gestureHistory2ndHand, setGestureHistory2ndHand] = useState<string[]>(["none", "none", "none", "none", "none"]);
   const previousGesture = useRef<string>("none");
+  const showPointer = useRef<boolean>(false);
 
   const act = {
     actions: {
@@ -71,13 +72,17 @@ export default function Home() {
         },
 
         enablePointer: () => {
-            console.log('Enable pointer')
+          showPointer.current = true;
+          viewPointer();
+          console.log('Enable pointer')
         },
 
         presentationMode: () => {
-            console.log('Machine enabled');
-            toggleMode(true);
-            toggleVid(false);
+          showPointer.current = false;
+          console.log('Machine enabled');
+          toggleMode(true);
+          toggleVid(false);
+          viewPointer();
         },
 
         videoMode: () => {
@@ -135,6 +140,12 @@ export default function Home() {
 
             //console.log(gestureHistory1stHand);
             //console.log("-------");
+
+            if (gesture[0].categoryName === "Pointing") {
+              var point = results.landmarks[0][4];  
+              pointerStyles.current = {display: 'block', left: (100-Math.round(point.x*100)).toString() + '%', top: (Math.round(point.y*100)).toString() + '%'};
+              viewPointer();
+            }
 
             setGestureHistory1stHand(gestureHistory);
             text1.current!.innerText = gesture[0].categoryName !== "" ? gesture[0].categoryName : "none";
@@ -245,6 +256,14 @@ export default function Home() {
     console.log(newShowVid.toString())
   }
 
+  async function viewPointer() {
+    if (showPointer.current) {
+      localStorage.setItem('pointer', JSON.stringify(pointerStyles.current));
+    } else {
+      localStorage.setItem('pointer', JSON.stringify({display: 'none', left: '0%', top: '0%'}));
+    }
+  }
+
   async function toggleMode(newPresentationMode: boolean) {
     setPresentationMode(newPresentationMode);
     localStorage.setItem('presentationMode', newPresentationMode.toString());
@@ -269,7 +288,6 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-        <div className={styles.pointer} style={pointerStyles} />
         <div className={styles.titleDiv}>
           <header className={styles.title}>Hand Recognition</header>
           <a href="/presentation" target="_blank">Open</a>

@@ -88,13 +88,3 @@
   border-radius: 5px;
   text-align: center;
 }
-
-.pointer {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-  padding: 1%;
-  color: rgb(05, 50, 0);
-  background-color: red;
-  border-radius: 100%;
-}
