@@ -1,6 +1,4 @@
-import {createMachine } from 'xstate';
-
-export const handPoseMachine = createMachine({
+export const handPoseMachineConfig = {
   id: 'handPose',
   initial: 'q_off',
   states: {
@@ -11,7 +9,6 @@ export const handPoseMachine = createMachine({
       }
     },
     q_turnon: {
-      entry: ['q_turn_on'],
       on: {
         ThumbsDown: 'q_slide'
       },
@@ -20,7 +17,7 @@ export const handPoseMachine = createMachine({
       }
     },
     q_slide: {
-      entry: ['machine_enabled'],
+      entry: ['presentationMode'],
       on: {
           ThumbsUp: 'q_turndown',
           TwoFingersUp: 'q_tovideo',
@@ -28,9 +25,6 @@ export const handPoseMachine = createMachine({
           PalmTildedRight: 'q_next1',
           PalmTildedLeft: 'q_prev1',
           Pointing: 'q_pointer1'
-      },
-      after: {
-          2000: { target: 'q_slide' }
       }
     },
 
@@ -64,9 +58,10 @@ export const handPoseMachine = createMachine({
     },
 
     q_video: {
+      entry: ['videoMode'],
       on: {
           TwoFingersUp: 'q_toslide',
-          fist: 'q_playstop',
+          Fist: 'q_playstop',
           PalmTildedLeft: 'q_rev1',
           PalmTildedRight: 'q_ff1',
           thumbs_together: 'q_vid1',
@@ -250,70 +245,16 @@ export const handPoseMachine = createMachine({
 
     q_pointer1: {
       on: {
-          fist: 'q_slide'
+          Fist: 'q_slide'
       }
     },
 
     q_pointer2: {
       on: {
-          fist: 'q_video'
+          Fist: 'q_video'
       }
     },
   }
-}, {
-        actions: {
-            goToTimestamp: (context, event) => {
-                console.log('Go to timestamp')
-            },
+};
 
-            playVideo: (context, event) => {
-                console.log('Play video')
-            },
-
-            stopVideo: (context, event) => {
-                console.log('Stop video')
-            },
-
-            forward_video: (context, event) => {
-               console.log('Forward video')
-            },
-
-            rewind_video: (context, event) => {
-                console.log('Rewind video')
-            },
-
-            goToSlideNumber: (context, event) => {
-               console.log('Go to slide number')
-            },
-
-            goToNextSlide: (context, event) => {
-               console.log('Go to next slide')
-            },
-
-            goToPrevSlide: (context, event) => {
-                //console.log(context);
-
-                //var newNum: number = context.num - 1;
-                //context.setNum(newNum);
-                //localStorage.setItem('slide', newNum.toString());
-            },
-
-            enablePointer: (context, event) => {
-                console.log('Enable pointer')
-            },
-
-            machine_enabled: (context, event) => {
-                console.log('Machine enabled');
-                console.log(context);
-            },
-
-            machine_disabled: (context, event) => {
-                console.log('Machine disabled');
-            },
-            q_turn_on: (context, event) => {
-                console.log('Turn on');
-            }
-        }
-    }
-);
 
