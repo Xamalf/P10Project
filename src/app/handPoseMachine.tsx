@@ -5,13 +5,12 @@ export const handPoseMachineConfig = {
     q_off: {
       entry: ['machine_disabled'],
       on: {
-        ThumbsDown: 'q_turnon',
-        ThumbsUp: 'q_turnoff'
+        OShape: 'q_turnon'
       }
     },
     q_turnon: {
       on: {
-        ThumbsUp: 'q_slide'
+        IShape: 'q_slide'
       },
       after: {
           2000: { target: 'q_off' }
@@ -20,7 +19,7 @@ export const handPoseMachineConfig = {
 
     q_turnoff: {
       on: {
-          ThumbsDown: 'q_off'
+          OShape: 'q_off'
       },
       after: {
           2000: { target: 'q_slide' }
@@ -30,9 +29,9 @@ export const handPoseMachineConfig = {
     q_slide: {
       entry: ['presentationMode'],
       on: {
-          ThumbsUp: 'q_turnoff',
+          IShape: 'q_turnoff',
           TwoFingersUp: 'q_tovideo',
-          thumbs_together: 'q_cs1',
+          Okay: 'q_cs1',
           PalmTildedRight: 'q_next1',
           PalmTildedLeft: 'q_prev1',
           Pointing: 'q_pointer1'
@@ -46,7 +45,7 @@ export const handPoseMachineConfig = {
         ThreeFingersExt: 'q_cs1',
         FourFingersExt: 'q_cs1',
         FiveFingersExt: 'q_cs1',
-        thumbs_together: 'q_cs2'
+        Okay: 'q_cs2'
       },
 
       after: {
@@ -155,7 +154,7 @@ export const handPoseMachineConfig = {
           Fist: 'q_playstop',
           PalmTildedLeft: 'q_rev1',
           PalmTildedRight: 'q_ff1',
-          thumbs_together: 'q_vid1',
+          Okay: 'q_vid1',
           Pointing: 'q_pointer2'
       }
     },
@@ -173,7 +172,7 @@ export const handPoseMachineConfig = {
           ThreeFingersExt: 'q_vid1',
           FourFingersExt: 'q_vid1',
           FiveFingersExt: 'q_vid1',
-          thumbs_together: 'q_vid2'
+          Okay: 'q_vid2'
       },
 
       after: {
@@ -191,8 +190,8 @@ export const handPoseMachineConfig = {
 
     q_playstop: {
       on: {
-          peace: 'q_play',
-          PalmUp: 'q_stop'
+          Peace: 'q_play',
+          FourFingersExt: 'q_stop'
       },
 
       after: {

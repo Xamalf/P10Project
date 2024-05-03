@@ -35,30 +35,6 @@ export default function Home() {
 
   const act = {
     actions: {
-        goToTimestamp: () => {
-            console.log('Go to timestamp')
-        },
-
-        playVideo: () => {
-            console.log('Play video')
-        },
-
-        stopVideo: () => {
-            console.log('Stop video')
-        },
-
-        forward_video: () => {
-           console.log('Forward video')
-        },
-
-        rewind_video: () => {
-            console.log('Rewind video')
-        },
-
-        goToSlideNumber: () => {
-           console.log('Go to slide number')
-        },
-
         goToNextSlide: () => {
            console.log('Go to next slide')
         },
@@ -170,30 +146,21 @@ export default function Home() {
           console.log(`prev gesture is: ${previousGesture.current}`);
           previousGesture.current = newGesture;
 
-          switch(newGesture) {
-            case 'PalmTilded':
-              send({type: 'PalmTilded', context: {num: num, setNum: setNum}});
-              break;
-            case 'PalmUp':
-              send({type: 'PalmUp'});
-              break;
-            case 'FistThumbExt':
-              send({type: 'enablePointer'});
-              break;
-            case '2FingersExt':
-              send({type: '2FingersExt'});
-              break;
-            case '3FingersExt':
-              send({type: '3FingersExt'});
-              break;
-            case '4FingersExt':
-              send({type: '4FingersExt'});
-              break;
-            case '5FingersExt':
-              send({type: '5FingersExt'});
-              break;
+          switch(newGesture) {     
             case 'Pointing':
               send({type: 'Pointing'});
+              break;
+            case '2FingersExt':
+              send({type: 'TwoFingersExt'});
+              break;
+            case '3FingersExt':
+              send({type: 'ThreeFingersExt'});
+              break;
+            case '4FingersExt':
+              send({type: 'FourFingersExt'});
+              break;
+            case '5FingersExt':
+              send({type: 'FiveFingersExt'});
               break;
             case 'TwoFingersSide':
               send({type: 'TwoFingersSide'});
@@ -201,11 +168,11 @@ export default function Home() {
             case 'TwoFingersUp':
               send({type: 'TwoFingersUp'});
               break;
-            case 'ThumbsUp':
-              send({type: 'ThumbsUp', context: {num: num, setNum: setNum}});
+            case 'OShape':
+              send({type: 'OShape', context: {num: num, setNum: setNum}});
               break;
-            case 'ThumbsDown':
-              send({type: 'ThumbsDown'});
+            case 'IShape':
+              send({type: 'IShape'});
               break;
             case 'Fist':
               send({type: 'Fist'});
