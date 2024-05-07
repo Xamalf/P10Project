@@ -35,42 +35,56 @@ export default function Home() {
 
   const act = {
     actions: {
-        goToNextSlide: () => {
-           console.log('Go to next slide')
-        },
+      goToNextSlide: () => {
+        nextSlide();
+      },
 
-        goToPrevSlide: () => {
-            //console.log(context);
+      goToPrevSlide: () => {
+        prevSlide();
+      },
 
-            //var newNum: number = context.num - 1;
-            //context.setNum(newNum);
-            //localStorage.setItem('slide', newNum.toString());
-        },
+      enablePointer: () => {
+        showPointer.current = true;
+        viewPointer();
+        console.log('Enable pointer')
+      },
 
-        enablePointer: () => {
-          showPointer.current = true;
-          viewPointer();
-          console.log('Enable pointer')
-        },
+      presentationMode: () => {
+        showPointer.current = false;
+        console.log('Machine enabled');
+        toggleMode(true);
+        toggleVid(false);
+        viewPointer();
+      },
 
-        presentationMode: () => {
-          showPointer.current = false;
-          console.log('Machine enabled');
-          toggleMode(true);
-          toggleVid(false);
-          viewPointer();
-        },
+      videoMode: () => {
+        toggleVid(true);
+      },
 
-        videoMode: () => {
-          toggleVid(true);
-        },
+      machine_disabled: () => {
+          console.log('Machine disabled');
+          toggleMode(false);
+      }, 
 
-        machine_disabled: () => {
-            console.log('Machine disabled');
-            toggleMode(false);
-        }
+      playVideo: () => {
+        play();
+      },
+
+      stopVideo: () => {
+        pause();
+      },
+
+      forward_video: () => {
+        console.log('Forward');
+        forward();
+      },
+
+      rewind_video: () => {
+        console.log('Rewind');
+        rewind();
+      }
     }
-}
+  }
 
   const [state, send] = useMachine(createMachine(handPoseMachineConfig, act));
 
@@ -119,7 +133,7 @@ export default function Home() {
 
             if (gesture[0].categoryName === "Pointing") {
               var point = results.landmarks[0][4];  
-              pointerStyles.current = {display: 'block', left: (100-Math.round(point.x*100)).toString() + '%', top: (Math.round(point.y*100)).toString() + '%'};
+              pointerStyles.current = {display: 'block', left: (100-(Math.round(point.x*1000)/10)).toString() + '%', top: (Math.round(point.y*1000)/10).toString() + '%'};
               viewPointer();
             }
 
@@ -140,6 +154,21 @@ export default function Home() {
 
         })
         let newGesture = gestureHistory1stHand.filter((gesture) => gesture === gestureHistory1stHand[4]).length > 2 ? gestureHistory1stHand[4] : "none";
+
+        if (newGesture == "5FingersExt") {
+          var MiddleFingerTip = results.landmarks[0][12];
+          var Wrist = results.landmarks[0][0];
+
+          var eta = Math.abs(MiddleFingerTip.y - Wrist.y) * 0.1
+
+          if (MiddleFingerTip.x - Wrist.x < -eta) {
+            newGesture = "PalmTildedRight";
+            text1.current!.innerText = "PalmTildedRight";
+          } else if (MiddleFingerTip.x - Wrist.x > (eta * 1.5)) {
+            newGesture = "PalmTildedLeft";
+            text1.current!.innerText = "PalmTildedLeft";
+          }
+        }
 
         if(newGesture !== null && newGesture !== "" && newGesture !== "none" && newGesture !== previousGesture.current) {
           console.log(`new gesture is: ${newGesture}`);
@@ -162,6 +191,12 @@ export default function Home() {
             case '5FingersExt':
               send({type: 'FiveFingersExt'});
               break;
+            case 'PalmTildedRight':
+              send({type: 'PalmTildedRight'});
+              break;
+            case 'PalmTildedLeft':
+              send({type: 'PalmTildedLeft'});
+              break;
             case 'TwoFingersSide':
               send({type: 'TwoFingersSide'});
               break;
@@ -176,6 +211,9 @@ export default function Home() {
               break;
             case 'Fist':
               send({type: 'Fist'});
+              break;
+            case 'Peace':
+              send({type: 'Peace'});
               break;
             case 'none':
             send({type: 'NONE'});
@@ -242,6 +280,25 @@ export default function Home() {
     setShowVid(localStorage.getItem('showVideo') === "true");
   }
 
+  async function rewind() {
+    localStorage.setItem('skip', "-5");
+    localStorage.setItem('skip', "0");
+  }
+
+  async function forward() {
+    localStorage.setItem('skip', "5");
+    localStorage.setItem('skip', "0");
+  }
+
+  async function play() {
+    localStorage.setItem('playPause', "false");
+    localStorage.setItem('playPause', "true");
+  }
+
+  async function pause() {
+    localStorage.setItem('playPause', "false");
+  }
+
   useEffect( () => {
     getStoredItems();
     setupCamera();
@@ -269,8 +326,6 @@ export default function Home() {
         <div className={styles.state}>
           <p>{state.value.toString()}</p>
         </div>
-        <button onClick={prevSlide}>prev</button>
-        <button onClick={nextSlide}>next</button>
       </div>
     </main>
   );

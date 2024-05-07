@@ -9,19 +9,19 @@ export default function PresentationView(props: any) {
 
   const play = () => { console.log("play"); video.current && video.current.play() }
   const pause = () => { console.log("pause"); video.current && video.current.pause() }
-  const time = (e: any) => { console.log("pause"); video.current && video.current.time(e.detail); }
+  const time = (e: any) => { console.log("pause"); video.current && video.current.skip(e.detail); }
 
 
   function addEventListeners() {
     document.addEventListener('play', play);
     document.addEventListener('pause', pause);
-    document.addEventListener('time', time);
+    document.addEventListener('skip', time);
   }
 
   function removeEventListeners() {
     document.removeEventListener('play', play);
     document.removeEventListener('pause', pause);
-    document.removeEventListener('time', time);
+    document.removeEventListener('skip', time);
   }
 
   useEffect( () => {

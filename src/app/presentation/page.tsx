@@ -35,9 +35,8 @@ export default function Presentation() {
         case "slide": setPage(parseInt(ev.newValue ?? "1") ?? 1); break;
         case "showVideo": setShowVideo(ev.newValue === "true"); break;
         case "presentationMode": setPresentationMode(ev.newValue === "true"); break;
-        case "test1": sendEvent("play"); break;
-        case "test2": sendEvent("pause"); break;
-        case "test3": sendEvent("time", parseInt(ev.newValue ?? "1") ?? 1); break;
+        case "playPause": ev.newValue === "true" ? sendEvent("play") : sendEvent("pause"); break;
+        case "skip": sendEvent("skip", parseInt(ev.newValue ?? "0") ?? 0); break;
       }
     }
   }, []);

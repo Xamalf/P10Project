@@ -63,7 +63,7 @@ export const handPoseMachineConfig = {
 
     q_next1: {
       on: {
-          PalmUp: 'q_next2'
+        FiveFingersExt: 'q_next2'
         },
 
         after: {
@@ -73,7 +73,7 @@ export const handPoseMachineConfig = {
 
     q_next2: {
       on: {
-          palm_prev1: 'q_next3'
+        PalmTildedLeft: 'q_next3'
         },
 
         after: {
@@ -82,6 +82,16 @@ export const handPoseMachineConfig = {
     },
 
     q_next3: {
+      on: {
+        Fist: 'q_next4'
+        },
+
+        after: {
+          2000: { target: 'q_slide' }
+        }
+    },
+
+    q_next4: {
       entry: ['goToNextSlide'],
       
       after: {
@@ -91,7 +101,7 @@ export const handPoseMachineConfig = {
 
     q_prev1: {
       on: {
-          PalmUp: 'q_prev2'
+        FiveFingersExt: 'q_prev2'
         },
 
         after: {
@@ -110,6 +120,16 @@ export const handPoseMachineConfig = {
     },
 
     q_prev3: {
+      on: {
+          Fist: 'q_prev4'
+      },
+
+      after: {
+          2000: { target: 'q_slide' }
+      }
+    },
+
+    q_prev4: {
       entry: ['goToPrevSlide'],
 
       after: {
@@ -218,7 +238,7 @@ export const handPoseMachineConfig = {
 
     q_ff1: {
       on: {
-          PalmUp: 'q_ff2'
+        FiveFingersExt: 'q_ff2'
       },
 
       after: {
@@ -237,6 +257,16 @@ export const handPoseMachineConfig = {
     },
 
     q_ff3: {
+      on: {
+          Fist: 'q_ff4'
+      },
+
+      after: {
+          2000: { target: 'q_video' }
+      }
+    },
+
+    q_ff4: {
       entry: ['forward_video'],
 
       after: {
@@ -246,7 +276,7 @@ export const handPoseMachineConfig = {
 
     q_rev1: {
       on: {
-          PalmUp: 'q_rev2'
+        FiveFingersExt: 'q_rev2'
       },
 
       after: {
@@ -265,6 +295,16 @@ export const handPoseMachineConfig = {
     },
 
     q_rev3: {
+      on: {
+          Fist: 'q_rev4'
+      },
+
+      after: {
+          2000: { target: 'q_video' }
+      }
+    },
+
+    q_rev4: {
       entry: ['rewind_video'],
 
       after: {
