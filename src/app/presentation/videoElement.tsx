@@ -11,8 +11,8 @@ const VideoElement = forwardRef((props: any, ref) => {
       pause() {
         video.current!.pause();
       },
-      time(t: number){
-        video.current!.currentTime = t;
+      skip(t: number){
+        video.current!.currentTime += t;
       }
     }));
 
