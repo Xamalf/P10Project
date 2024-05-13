@@ -2,6 +2,20 @@
 import styles from "./setupView.module.css";
 import VideoElement from "./videoElement"
 import PresentationElement from "./presentationElement";
+import Grid from '@mui/material/Unstable_Grid2'
+import Box from '@mui/material/Box'
+import Card from '@mui/material/Card'
+import CardMedia from '@mui/material/CardMedia'
+import CardContent from '@mui/material/CardContent'
+import CardActions from '@mui/material/CardActions'
+import Button from '@mui/material/Button'
+import { styled } from '@mui/material/styles'
+
+const HiddenInput = styled('input')({
+  height: 0,
+  width: 0,
+  overflow: 'hidden',
+})
 
 export default function SetupView(props: any) {
   const newPDF = (event: any) => {
@@ -19,16 +33,40 @@ export default function SetupView(props: any) {
   }
 
   return (
-    <div className={styles.main}>
+    <Box margin={2}>
+      <Grid container spacing={2} columns={2}>
+        <Grid xs={2}>
         <header className={styles.title}>Setup Presentation</header>
-        <div className={styles.presentation}>
-            <input className={styles.presentationInput} type="file" accept=".pdf" onChange={newPDF} />
+        </Grid>
+        <Grid xs={1} sx={{height: '100%'}}>
+          <Card style={{background: '#70a3bd'}}>
             <PresentationElement pdf={props.pdf} styles={styles.presentationElement}/>
-        </div>
-        <div className={styles.video}>
-            <input className={styles.videoInput} type="file" accept=".mp4" onChange={newVideo} />
-            <VideoElement video={props.video} styles={styles.videoElement} controls={true}/>
-        </div>
-    </div>
+            <CardActions style={{justifyContent: 'center'}}>
+              <Button
+                component="label"
+                variant="contained"
+              >
+                Input PDF
+                <HiddenInput type="file" accept=".pdf" onChange={newPDF} />
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+        <Grid xs={1} sx={{height: '100%'}}>
+        <Card style={{background: '#70a3bd'}}>
+          <VideoElement video={props.video} styles={styles.videoElement} controls={true}/>
+            <CardActions style={{justifyContent: 'center'}}>
+              <Button
+                component="label"
+                variant="contained" 
+              >
+                Input Video
+                <HiddenInput type="file" accept=".mp4" onChange={newVideo} />
+              </Button>
+            </CardActions>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 }

@@ -8,7 +8,10 @@ import { drawLandmarks } from "@mediapipe/drawing_utils";
 import { handPoseMachineConfig } from './handPoseMachine';
 import {createMachine } from 'xstate';
 import { useMachine } from '@xstate/react';
-
+import Grid from '@mui/material/Unstable_Grid2'
+import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 type pointerStyle = {
   display: string,
@@ -32,6 +35,9 @@ export default function Home() {
   const [gestureHistory2ndHand, setGestureHistory2ndHand] = useState<string[]>(["none", "none", "none", "none", "none"]);
   const previousGesture = useRef<string>("none");
   const showPointer = useRef<boolean>(false);
+  const getPointerVals = useRef<boolean>(false);
+  const pointerVals = useRef<number[]>([0, 0, 0, 0]);
+  const precision = 10000000;
 
   const act = {
     actions: {
@@ -44,6 +50,7 @@ export default function Home() {
       },
 
       enablePointer: () => {
+        getPointerVals.current = true;
         showPointer.current = true;
         viewPointer();
         console.log('Enable pointer')
@@ -132,8 +139,15 @@ export default function Home() {
             //console.log("-------");
 
             if (gesture[0].categoryName === "Pointing") {
-              var point = results.landmarks[0][4];  
-              pointerStyles.current = {display: 'block', left: (100-(Math.round(point.x*1000)/10)).toString() + '%', top: (Math.round(point.y*1000)/10).toString() + '%'};
+              var point = results.landmarks[0][4]; 
+              console.log(point.x * precision)
+              console.log(point.y * precision)
+              var x = (point.x * precision - pointerVals.current[0]) / pointerVals.current[1];
+              var y = (point.y * precision - pointerVals.current[2]) / pointerVals.current[3];
+              console.log(pointerVals.current);
+              console.log(x);
+              console.log(y);
+              pointerStyles.current = {display: 'block', left: (100-x*100).toString() + '%', top: (y*100).toString() + '%'};
               viewPointer();
             }
 
@@ -168,6 +182,21 @@ export default function Home() {
             newGesture = "PalmTildedLeft";
             text1.current!.innerText = "PalmTildedLeft";
           }
+        }
+
+        if (getPointerVals.current && newGesture == "Pointing") {
+          var IndexFingerTip = results.landmarks[0][4];
+          var Wrist = results.landmarks[0][0];
+
+          var length = Math.sqrt(Math.pow(IndexFingerTip.x * precision - Wrist.x * precision, 2) + Math.pow(IndexFingerTip.y * precision - Wrist.y * precision, 2));
+          var width = length;
+          var height = length;
+
+          pointerVals.current[0] = IndexFingerTip.x * precision - width;
+          pointerVals.current[1] = width * 2;
+          pointerVals.current[2] = IndexFingerTip.y * precision - height;
+          pointerVals.current[3] = height * 2;
+          getPointerVals.current = false;
         }
 
         if(newGesture !== null && newGesture !== "" && newGesture !== "none" && newGesture !== previousGesture.current) {
@@ -300,7 +329,7 @@ export default function Home() {
   }
 
   useEffect( () => {
-    getStoredItems();
+    //getStoredItems();
     setupCamera();
     setupHands();
   }, []);
@@ -312,20 +341,35 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-        <div className={styles.titleDiv}>
-          <header className={styles.title}>Hand Recognition</header>
-          <a href="/presentation" target="_blank">Open</a>
-        </div>
-        <div className={styles.hidden}>
-          <video style={{ display: 'none' }} playsInline ref={frame}/>
-        </div>
-      <div className={styles.canvas}>
-        <canvas ref={frameCanvas} width={cameraSettings.width} height={cameraSettings.height}/>
-        <p className={styles.handsign1} ref={text1}>None</p>
-        <p className={styles.handsign2} ref={text2}>None</p>
-        <div className={styles.state}>
-          <p>{state.value.toString()}</p>
-        </div>
+      <Box margin={2}>
+        <Grid container spacing={2} columns={4}>
+          <Grid xs={4}>
+            <header className={styles.title}>Hand Recognition<IconButton style={{position: 'fixed', right: '30px', top: '32px'}} href="/presentation" target="_blank"><OpenInNewIcon style={{height: '100%', color: 'black'}} fontSize="large"/></IconButton></header>
+          </Grid>
+          <Grid xs={1}>
+            <div className={styles.state}>
+              <p>{state.value.toString()}</p>
+            </div>
+          </Grid>
+          <Grid justifyContent='center' xs={3}>
+            <Grid alignItems='center' container spacing={2} columns={2}>
+              <Grid xs={2}>
+                <div className={styles.canvasDiv}>
+                  <canvas className={styles.canvas} ref={frameCanvas} width={cameraSettings.width} height={cameraSettings.height}/>
+                </div>
+              </Grid>
+              <Grid xs={1}>
+                <p className={styles.handsign1} ref={text1}>None</p>
+              </Grid>
+              <Grid xs={1}>
+                <p className={styles.handsign2} ref={text2}>None</p>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Box>
+      <div className={styles.hidden}>
+        <video style={{ display: 'none' }} playsInline ref={frame}/>
       </div>
     </main>
   );

@@ -20,7 +20,7 @@ const VideoElement = forwardRef((props: any, ref) => {
       <div className={props.styles}>     
       {props.video 
       ? <video ref={video} controls={props.controls??false}><source src={props.video} type="video/mp4"/></video> 
-      : <p style={{color: "white"}}>No Video</p>}
+      : <p>No Video</p>}
       </div>
   );
 });

@@ -9,7 +9,7 @@ export default function PresentationElement(props: any) {
     <div className={props.styles}>   
       {props.pdf ? <Document file={props.pdf}>
       <Page pageNumber={props.page??1} renderTextLayer={false} renderAnnotationLayer={false} canvasBackground="transparent" width={4096}/>
-      </Document> : <p style={{color: "white"}}>No PDF</p>}
+      </Document> : <p>No PDF</p>}
     </div>
   );
 }

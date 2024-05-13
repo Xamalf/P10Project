@@ -32,8 +32,8 @@ export const handPoseMachineConfig = {
           IShape: 'q_turnoff',
           TwoFingersUp: 'q_tovideo',
           Okay: 'q_cs1',
-          PalmTildedRight: 'q_next1',
-          PalmTildedLeft: 'q_prev1',
+          PalmTildedLeft: 'q_next1',
+          PalmTildedRight: 'q_prev1',
           Pointing: 'q_pointer1'
       }
     },
@@ -73,7 +73,7 @@ export const handPoseMachineConfig = {
 
     q_next2: {
       on: {
-        PalmTildedLeft: 'q_next3'
+        PalmTildedRight: 'q_next3'
         },
 
         after: {
@@ -111,7 +111,7 @@ export const handPoseMachineConfig = {
 
     q_prev2: {
       on: {
-          PalmTildedRight: 'q_prev3'
+          PalmTildedLeft: 'q_prev3'
       },
 
       after: {

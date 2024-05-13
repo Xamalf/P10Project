@@ -9,15 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/cache": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@mediapipe/camera_utils": "^0.3.1675466862",
     "@mediapipe/drawing_utils": "^0.3.1675466124",
     "@mediapipe/hands": "^0.4.1675469240",
     "@mediapipe/tasks-vision": "^0.10.10",
+    "@mui/icons-material": "^5.15.17",
+    "@mui/material-nextjs": "^5.15.11",
     "@xstate/react": "^4.1.1",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
-    "react-pdf": "^7.7.1",
+    "react-pdf": "^8.0.0",
     "xstate": "^5.11.0"
   },
   "devDependencies": {
