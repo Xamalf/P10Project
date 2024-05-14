@@ -39,7 +39,7 @@ export default function SetupView(props: any) {
         <header className={styles.title}>Setup Presentation</header>
         </Grid>
         <Grid xs={1} sx={{height: '100%'}}>
-          <Card style={{background: '#70a3bd'}}>
+          <Card style={{border: '1px solid black', borderRadius: '12px'}}>
             <PresentationElement pdf={props.pdf} styles={styles.presentationElement}/>
             <CardActions style={{justifyContent: 'center'}}>
               <Button
@@ -53,7 +53,7 @@ export default function SetupView(props: any) {
           </Card>
         </Grid>
         <Grid xs={1} sx={{height: '100%'}}>
-        <Card style={{background: '#70a3bd'}}>
+        <Card style={{border: '1px solid black', borderRadius: '12px'}}>
           <VideoElement video={props.video} styles={styles.videoElement} controls={true}/>
             <CardActions style={{justifyContent: 'center'}}>
               <Button
