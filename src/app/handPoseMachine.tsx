@@ -172,8 +172,8 @@ export const handPoseMachineConfig = {
       on: {
           TwoFingersUp: 'q_toslide',
           Fist: 'q_playstop',
-          PalmTildedLeft: 'q_rev1',
-          PalmTildedRight: 'q_ff1',
+          PalmTildedRight: 'q_rev1',
+          PalmTildedLeft: 'q_ff1',
           Okay: 'q_vid1',
           Pointing: 'q_pointer2'
       }
@@ -248,7 +248,7 @@ export const handPoseMachineConfig = {
 
     q_ff2: {
       on: {
-          PalmTildedLeft: 'q_ff3'
+        PalmTildedRight: 'q_ff3'
       },
 
       after: {
@@ -286,7 +286,7 @@ export const handPoseMachineConfig = {
 
     q_rev2: {
       on: {
-          PalmTildedRight: 'q_rev3'
+          PalmTildedLeft: 'q_rev3'
       },
 
       after: {

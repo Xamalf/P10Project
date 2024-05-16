@@ -147,7 +147,7 @@ export default function Home() {
               console.log(pointerVals.current);
               console.log(x);
               console.log(y);
-              pointerStyles.current = {display: 'block', left: (100-x*100).toString() + '%', top: (y*100).toString() + '%'};
+              pointerStyles.current = {display: 'block', left: (x*100).toString() + '%', top: (y*100).toString() + '%'};
               viewPointer();
             }
 
@@ -330,6 +330,7 @@ export default function Home() {
 
   useEffect( () => {
     //getStoredItems();
+    localStorage.setItem('slide', '2');
     setupCamera();
     setupHands();
   }, []);
