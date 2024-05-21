@@ -28,15 +28,15 @@ export default function Home() {
   const text1 = useRef<HTMLParagraphElement>(null);
   const text2 = useRef<HTMLParagraphElement>(null);
   const [num, setNum] = useState<number>(1);
-  const [showVid, setShowVid] = useState<boolean>(false);
-  const [presentationMode, setPresentationMode] = useState<boolean>(false);
+  const [playVideo, setPlayVideo] = useState<boolean>(false);
   const pointerStyles = useRef<pointerStyle>({display: 'none', left: '0%', top: '0%'});
   const [gestureHistory1stHand, setGestureHistory1stHand] = useState<string[]>(["none", "none", "none", "none", "none"]);
-  const [gestureHistory2ndHand, setGestureHistory2ndHand] = useState<string[]>(["none", "none", "none", "none", "none"]);
   const previousGesture = useRef<string>("none");
   const showPointer = useRef<boolean>(false);
   const getPointerVals = useRef<boolean>(false);
   const pointerVals = useRef<number[]>([0, 0, 0, 0]);
+  const [pointerHistoryX, setPointerHistoryX] = useState<number[]>([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [pointerHistoryY, setPointerHistoryY] = useState<number[]>([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const precision = 10000000;
 
   const act = {
@@ -73,23 +73,9 @@ export default function Home() {
           toggleMode(false);
       }, 
 
-      playVideo: () => {
-        play();
+      playstopVideo: () => {
+        playPause();
       },
-
-      stopVideo: () => {
-        pause();
-      },
-
-      forward_video: () => {
-        console.log('Forward');
-        forward();
-      },
-
-      rewind_video: () => {
-        console.log('Rewind');
-        rewind();
-      }
     }
   }
 
@@ -114,10 +100,6 @@ export default function Home() {
     let results: MPHands.GestureRecognizerResult|undefined = grec.current?.recognizeForVideo(frame.current, Date.now());
 
     if (results) {
-      //console.log(results)
-
-      let isFirst = true;
-
       if (frameCanvas.current) { 
         if (results.landmarks) {
           results.landmarks.forEach((landmarks) => {
@@ -127,64 +109,41 @@ export default function Home() {
         }
 
         results.gestures.forEach((gesture) => {
-          if(isFirst) {
             let gestureHistory = gestureHistory1stHand;
             gestureHistory.shift();
 
             gestureHistory.push(gesture[0].categoryName);
 
-            //console.log(gestureHistory);
-
-            //console.log(gestureHistory1stHand);
-            //console.log("-------");
-
-            if (gesture[0].categoryName === "Pointing") {
+            if (showPointer.current) {
               var point = results.landmarks[0][4]; 
-              console.log(point.x * precision)
-              console.log(point.y * precision)
-              var x = (point.x * precision - pointerVals.current[0]) / pointerVals.current[1];
-              var y = (point.y * precision - pointerVals.current[2]) / pointerVals.current[3];
-              console.log(pointerVals.current);
-              console.log(x);
-              console.log(y);
-              pointerStyles.current = {display: 'block', left: (x*100).toString() + '%', top: (y*100).toString() + '%'};
+              let xHistory = pointerHistoryX;
+              let yHistory = pointerHistoryY;
+              xHistory.shift(); 
+              yHistory.shift(); 
+              xHistory.push(point.x);
+              yHistory.push(point.y);
+
+              var avgx = xHistory.reduce((sum, x) => sum + x) / xHistory.length;
+              var avgy = yHistory.reduce((sum, y) => sum + y) / yHistory.length;
+              //console.log(point.x * precision)
+              //console.log(point.y * precision)
+              var x = (avgx * precision - pointerVals.current[0]) / pointerVals.current[1];
+              var y = (avgy * precision - pointerVals.current[2]) / pointerVals.current[3];
+              //console.log(pointerVals.current);
+              //console.log(x);
+              //console.log(y);
+              pointerStyles.current = {display: 'block', left: (100-x*100).toString() + '%', top: (y*100).toString() + '%'};
               viewPointer();
+              setPointerHistoryX(xHistory);
+              setPointerHistoryY(yHistory);
             }
 
             setGestureHistory1stHand(gestureHistory);
             text1.current!.innerText = gesture[0].categoryName !== "" ? gesture[0].categoryName : "none";
-            isFirst = false;
-          } else {
-            const [firstGesture, ...restOfGestureHistory ] = gestureHistory2ndHand;
-            setGestureHistory2ndHand([...restOfGestureHistory, gesture[0].categoryName]);
-            text2.current!.innerText = gesture[0].categoryName !== "" ? gesture[0].categoryName : "none";
-
-          }
-
-          //console.log(gesture)
-          
-          //console.log(gesture[0].categoryName);
-
-
         })
         let newGesture = gestureHistory1stHand.filter((gesture) => gesture === gestureHistory1stHand[4]).length > 2 ? gestureHistory1stHand[4] : "none";
 
-        if (newGesture == "5FingersExt") {
-          var MiddleFingerTip = results.landmarks[0][12];
-          var Wrist = results.landmarks[0][0];
-
-          var eta = Math.abs(MiddleFingerTip.y - Wrist.y) * 0.1
-
-          if (MiddleFingerTip.x - Wrist.x < -eta) {
-            newGesture = "PalmTildedRight";
-            text1.current!.innerText = "PalmTildedRight";
-          } else if (MiddleFingerTip.x - Wrist.x > (eta * 1.5)) {
-            newGesture = "PalmTildedLeft";
-            text1.current!.innerText = "PalmTildedLeft";
-          }
-        }
-
-        if (getPointerVals.current && newGesture == "Pointing") {
+        if (getPointerVals.current) {
           var IndexFingerTip = results.landmarks[0][4];
           var Wrist = results.landmarks[0][0];
 
@@ -208,35 +167,14 @@ export default function Home() {
             case 'Pointing':
               send({type: 'Pointing'});
               break;
-            case '2FingersExt':
-              send({type: 'TwoFingersExt'});
-              break;
             case '3FingersExt':
               send({type: 'ThreeFingersExt'});
-              break;
-            case '4FingersExt':
-              send({type: 'FourFingersExt'});
-              break;
-            case '5FingersExt':
-              send({type: 'FiveFingersExt'});
-              break;
-            case 'PalmTildedRight':
-              send({type: 'PalmTildedRight'});
-              break;
-            case 'PalmTildedLeft':
-              send({type: 'PalmTildedLeft'});
               break;
             case 'TwoFingersSide':
               send({type: 'TwoFingersSide'});
               break;
             case 'TwoFingersUp':
               send({type: 'TwoFingersUp'});
-              break;
-            case 'OShape':
-              send({type: 'OShape', context: {num: num, setNum: setNum}});
-              break;
-            case 'IShape':
-              send({type: 'IShape'});
               break;
             case 'Fist':
               send({type: 'Fist'});
@@ -262,20 +200,22 @@ export default function Home() {
       "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
 
     grec.current = await MPHands.GestureRecognizer.createFromOptions(vision.current, {
-      numHands: 2,
+      numHands: 1,
       baseOptions: {
         modelAssetPath: "./gesture_recognizer.task",
         delegate: "GPU",
       },
     });
 
-    grec.current.setOptions({ runningMode: "VIDEO", numHands: 2, customGesturesClassifierOptions: {scoreThreshold: 0.8} })
+    grec.current.setOptions({ runningMode: "VIDEO", numHands: 1, customGesturesClassifierOptions: {scoreThreshold: 0.8} })
   }
 
   async function prevSlide() {
     var newNum: number = num - 1;
-    setNum(newNum);
-    localStorage.setItem('slide', newNum.toString());
+    if (newNum > 0) {
+      setNum(newNum);
+      localStorage.setItem('slide', newNum.toString());
+    }
   }
 
   async function nextSlide() {
@@ -285,7 +225,6 @@ export default function Home() {
   }
 
   async function toggleVid(newShowVid: boolean) {
-    setShowVid(newShowVid);
     localStorage.setItem('showVideo', newShowVid.toString());
     console.log(newShowVid.toString())
   }
@@ -299,46 +238,21 @@ export default function Home() {
   }
 
   async function toggleMode(newPresentationMode: boolean) {
-    setPresentationMode(newPresentationMode);
     localStorage.setItem('presentationMode', newPresentationMode.toString());
     console.log(newPresentationMode.toString())
   }
 
-  async function getStoredItems() {
-    setNum(parseInt(localStorage.getItem('slide') ?? "1") ?? 1);
-    setShowVid(localStorage.getItem('showVideo') === "true");
-  }
-
-  async function rewind() {
-    localStorage.setItem('skip', "-5");
-    localStorage.setItem('skip', "0");
-  }
-
-  async function forward() {
-    localStorage.setItem('skip', "5");
-    localStorage.setItem('skip', "0");
-  }
-
-  async function play() {
-    localStorage.setItem('playPause', "false");
-    localStorage.setItem('playPause', "true");
-  }
-
-  async function pause() {
-    localStorage.setItem('playPause', "false");
+  async function playPause() {
+    var newPlayVideo = !playVideo;
+    setPlayVideo(newPlayVideo);
+    localStorage.setItem('playPause', newPlayVideo.toString());
   }
 
   useEffect( () => {
-    //getStoredItems();
-    localStorage.setItem('slide', '2');
+    localStorage.setItem('slide', '1');
     setupCamera();
     setupHands();
   }, []);
-
-  const videoConstraints = {
-    width: 1280,
-    height: 720,
-  }
 
   return (
     <main className={styles.main}>
