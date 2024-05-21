@@ -7,9 +7,9 @@ import { useRef, useEffect } from "react";
 export default function PresentationView(props: any) {
   const video = useRef<any>(null);
 
-  const play = () => { console.log("play"); video.current && video.current.play() }
-  const pause = () => { console.log("pause"); video.current && video.current.pause() }
-  const time = (e: any) => { console.log("pause"); video.current && video.current.skip(e.detail); }
+  const play = () => { video.current && video.current.play() }
+  const pause = () => { video.current && video.current.pause() }
+  const time = (e: any) => { video.current && video.current.skip(e.detail); }
 
 
   function addEventListeners() {

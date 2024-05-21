@@ -1,0 +1,29 @@
+.hidden {
+  display: none;
+}
+
+.canvasDiv {
+  display: grid;
+  grid:
+  ". c ."
+  / 1fr auto 1fr;
+}
+
+.canvas {
+  grid-area: c;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  object-fit: scale-down;
+  object-position: center;
+  transform: scaleX(-1);
+}
+
+.handsign  {
+  font-size: 30px;
+  color: rgb(05, 50, 0);
+  border: 1px solid black;
+  border-radius: 12px;
+  text-align: center;
+  margin: 0;
+}
