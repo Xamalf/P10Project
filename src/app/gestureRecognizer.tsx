@@ -18,6 +18,7 @@ const Gesture = forwardRef((props: any, ref) => {
   const pointerVals = useRef<number[]>([0, 0, 0, 0]);
   const [pointerHistoryX, setPointerHistoryX] = useState<number[]>([0, 0, 0, 0, 0, 0]);
   const [pointerHistoryY, setPointerHistoryY] = useState<number[]>([0, 0, 0, 0, 0, 0]);
+  const [slideHistoryX, setSlideHistoryX] = useState<number[]>([0, 0, 0, 0, 0, 0]);
   const precision = 10000000;
 
   useImperativeHandle(ref, () => ({
@@ -84,16 +85,16 @@ const Gesture = forwardRef((props: any, ref) => {
           }
 
           if (props.captureSlideVals.current) {
-            let xHistory = pointerHistoryX;
-            xHistory.shift();
-            xHistory.push(IndexFingerTip.x);
+            let slideHistory = slideHistoryX;
+            slideHistory.shift();
+            slideHistory.push(Wrist.x);
 
-            var avgx = xHistory.reduce((sum, x) => sum + x) / xHistory.length;
+            var avgx = slideHistory.reduce((sum, x) => sum + x) / slideHistory.length;
 
             var x = (avgx * precision - pointerVals.current[0]) / pointerVals.current[1];
 
             props.updateView(x);
-            setPointerHistoryX(xHistory);
+            setSlideHistoryX(slideHistory);
           }
 
           setGestureHistory(gestureHistory);
@@ -130,6 +131,10 @@ const Gesture = forwardRef((props: any, ref) => {
   useEffect( () => {
     setupCamera();
     setupHands();
+
+    return () => {
+      camera.current?.stop()
+    }
   }, []);
 
   return (

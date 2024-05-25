@@ -8,7 +8,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 export default function PresentationElement(props: any) {
   return (
     <div className={props.styles}>   
-      {props.pdf ? <Document file={props.pdf} onLoadSuccess={({numPages: pages}) => {if (props.pdfPages) {props.pdfPages.current = pages}; }}>
+      {props.pdf ? <Document file={props.pdf} onLoadSuccess={({numPages: pages}) => {if (props.pdfPages) {localStorage.setItem('pdfPages', pages.toString()); }; }}>
       <Page pageNumber={props.page??1} renderTextLayer={false} renderAnnotationLayer={false} canvasBackground="transparent" width={4096}/>
       </Document> : <p>No PDF</p>}
     </div>

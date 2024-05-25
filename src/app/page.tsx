@@ -21,9 +21,11 @@ export default function Home() {
   const [num, setNum] = useState<number>(1);
   const [playVideo, setPlayVideo] = useState<boolean>(false);
   const pointerStyles = useRef<pointerStyle>({display: 'none', left: '0%', top: '0%'});
+  const showVideo = useRef<boolean>(false);
   const showPointer = useRef<boolean>(false);
   const getPointerVals = useRef<boolean>(false);
   const captureSlideVals = useRef<boolean>(false);
+  const pdfPages = useRef<number>(0);
 
   async function prevSlide() {
     var newNum: number = num - 1;
@@ -35,13 +37,15 @@ export default function Home() {
 
   async function nextSlide() {
     var newNum: number = num + 1;
-    setNum(newNum);
-    localStorage.setItem('slide', newNum.toString());
+    if (newNum <= pdfPages.current) {
+      setNum(newNum);
+      localStorage.setItem('slide', newNum.toString());
+    }
   }
 
   async function toggleVid(newShowVid: boolean) {
     localStorage.setItem('showVideo', newShowVid.toString());
-    console.log(newShowVid.toString())
+    showVideo.current = newShowVid;
   }
 
   async function viewPointer() {
@@ -53,7 +57,14 @@ export default function Home() {
   }
 
   async function updateView(pagePercent: number) {
-    localStorage.setItem('captureSlide', JSON.stringify({temp: 'true', percent: pagePercent.toString()}));
+    if (showVideo.current) {
+      localStorage.setItem('captureSlide', JSON.stringify({temp: 'true', percent: pagePercent.toString()}));
+    } else {
+      var newNum: number = Math.ceil(pdfPages.current*pagePercent);
+      newNum = newNum < 1 ? 1 : newNum > pdfPages.current ? pdfPages.current : newNum;
+      setNum(newNum);
+      localStorage.setItem('slide', newNum.toString());
+    }
   }
 
   async function captureSlide(done: boolean) {
@@ -93,6 +104,13 @@ export default function Home() {
   useEffect( () => {
     localStorage.setItem('slide', '1');
     localStorage.setItem('playPause', 'false');
+    pdfPages.current = parseInt(localStorage.getItem("pdfPages") ?? "0") ?? 0;
+
+    window.onstorage = (ev) => {
+      if (ev.key == "pdfPages") {
+        pdfPages.current = parseInt(ev.newValue ?? "0") ?? 0;
+      }
+    }
   }, []);
 
   return (

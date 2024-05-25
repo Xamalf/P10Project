@@ -13,9 +13,12 @@ const StateView = forwardRef((props: any, ref) => {
       goToNextSlide:    () => { props.nextSlide(); },
       goToPrevSlide:    () => { props.prevSlide(); },
       enablePointer:    () => { props.enablePointer(true); },
-      videoMode:        () => { props.toggleVid(true); },
       machine_disabled: () => { props.toggleMode(false); }, 
       playstopVideo:    () => { props.playPause(); },
+      videoMode:        () => { 
+        props.toggleVid(true); 
+        props.enablePointer(false);
+      },
       presentationMode: () => {
         props.toggleMode(true);
         props.toggleVid(false);

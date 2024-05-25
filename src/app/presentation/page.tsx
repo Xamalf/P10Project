@@ -38,11 +38,6 @@ export default function Presentation() {
       console.log(showVideo);
       if (showVideo) {
         sendEvent("captureSlide", percent)
-      } else {
-        console.log('hhh');
-        console.log(pdfPages.current);
-        console.log(Math.ceil(pdfPages.current*percent));
-        setPage(Math.ceil(pdfPages.current*percent));
       }
     }
   }
