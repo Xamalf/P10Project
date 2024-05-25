@@ -5,7 +5,7 @@ export const handPoseMachineConfig = {
     q_off: {
       entry: ['machine_disabled'],
       on: {
-        Fist: 'q_turnon'
+        OShape: 'q_turnon'
       }
     },
     q_turnon: {
@@ -13,7 +13,7 @@ export const handPoseMachineConfig = {
         Peace: 'q_slide'
       },
       after: {
-          2000: { target: 'q_off' }
+          2000: { target: 'q_off', actions: 'timeOut' }
       }
     },
 
@@ -22,28 +22,33 @@ export const handPoseMachineConfig = {
         Peace: 'q_off'
       },
       after: {
-          2000: { target: 'q_slide' }
+          2000: { target: 'q_slide', actions: 'timeOut' }
       }
     },
 
     q_slide: {
       entry: ['presentationMode'],
       on: {
-          Fist: 'q_turnoff',
-          ThreeFingersExt: 'q_tovideo',
+          OShape: 'q_turnoff',
+          Peace: 'q_tovideo',
           TwoFingersUp: 'q_next1',
           TwoFingersSide: 'q_prev1',
+          Okay: 'q_moveslider1',
           Pointing: 'q_pointer1'
+      },
+      after: {
+        800: { target: 'q_slide', actions: 'timeOut' }
       }
     },
 
     q_next1: {
       on: {
-        TwoFingersSide: 'q_next2'
+        TwoFingersSide: 'q_next2',
+        Fist: 'q_slide'
         },
 
         after: {
-          2000: { target: 'q_slide' }
+          2000: { target: 'q_slide', actions: 'timeOut' }
         }
     },
 
@@ -57,11 +62,12 @@ export const handPoseMachineConfig = {
 
     q_prev1: {
       on: {
-        TwoFingersUp: 'q_prev2'
+        TwoFingersUp: 'q_prev2',
+        Fist: 'q_slide'
         },
 
         after: {
-          2000: { target: 'q_slide' }
+          2000: { target: 'q_slide', actions: 'timeOut' }
         }
     },
 
@@ -82,33 +88,55 @@ export const handPoseMachineConfig = {
       }
     },
 
+    q_moveslider1: {
+      entry: ['moveslider'],
+
+      on: {
+          Fist: 'q_movesliderDone1'
+      }
+    },
+
+    q_movesliderDone1: {
+      entry: ['movesliderDone'],
+
+      after: {
+          10: {target: 'q_slide' }
+      }
+      
+    },
+
     q_tovideo: {
       on: {
-        Peace: 'q_video'
+        FourFingersExt: 'q_video',
+        Fist: 'q_slide'
       },
 
       after: {
-          2000: { target: 'q_slide' }
+          2000: { target: 'q_slide', actions: 'timeOut' }
       }
     },
 
     q_toslide: {
       on: {
-        Peace: 'q_slide'
+        FourFingersExt: 'q_slide',
+        Fist: 'q_video'
       },
 
       after: {
-          2000: {target: 'q_video'}
+          2000: {target: 'q_video', actions: 'timeOut' }
       }
     },
 
     q_video: {
       entry: ['videoMode'],
       on: {
-          ThreeFingersExt: 'q_toslide',
-          Fist: 'q_toplaystop',
-          Okay: 'q_moveslider',
+          Peace: 'q_toslide',
+          OShape: 'q_toplaystop',
+          Okay: 'q_moveslider2',
           Pointing: 'q_pointer2'
+      },
+      after: {
+        800: { target: 'q_video', actions: 'timeOut' }
       }
     },
 
@@ -123,10 +151,11 @@ export const handPoseMachineConfig = {
     q_toplaystop: {
       on: {
           Peace: 'q_playstop',
+          Fist: 'q_video'
       },
 
       after: {
-          2000: {target: 'q_video'}
+          2000: {target: 'q_video', actions: 'timeOut' }
       }
     },
 
@@ -134,17 +163,26 @@ export const handPoseMachineConfig = {
       entry: ['playstopVideo'],
 
       after: {
-          10: {target: 'q_video'}
+          10: {target: 'q_video' }
       }
       
     },
 
-    q_moveslider: {
-      entry: ['moveSlider'],
+    q_moveslider2: {
+      entry: ['moveslider'],
 
       on: {
-          Fist: 'q_video'
+          Fist: 'q_movesliderDone2'
       }
+    },
+
+    q_movesliderDone2: {
+      entry: ['movesliderDone'],
+
+      after: {
+          10: {target: 'q_video' }
+      }
+      
     },
   }
 };

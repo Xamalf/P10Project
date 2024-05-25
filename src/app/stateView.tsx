@@ -9,6 +9,7 @@ import { useMachine } from '@xstate/react';
 const StateView = forwardRef((props: any, ref) => {
   const act = {
     actions: {
+      timeOut:          () => { props.timeOut(); },
       goToNextSlide:    () => { props.nextSlide(); },
       goToPrevSlide:    () => { props.prevSlide(); },
       enablePointer:    () => { props.enablePointer(true); },
@@ -20,6 +21,12 @@ const StateView = forwardRef((props: any, ref) => {
         props.toggleVid(false);
         props.enablePointer(false);
       },
+      moveslider:       () => {
+        props.captureSlide(false);
+      },
+      movesliderDone:   () => {
+        props.captureSlide(true);
+      }
     }
   }
 
@@ -34,8 +41,8 @@ const StateView = forwardRef((props: any, ref) => {
         case 'Pointing':
         send({type: 'Pointing'});
         break;
-        case '3FingersExt':
-        send({type: 'ThreeFingersExt'});
+        case 'FourFingersExt':
+        send({type: 'FourFingersExt'});
         break;
         case 'TwoFingersSide':
         send({type: 'TwoFingersSide'});
@@ -48,6 +55,12 @@ const StateView = forwardRef((props: any, ref) => {
         break;
         case 'Peace':
         send({type: 'Peace'});
+        break;
+        case 'Okay':
+        send({type: 'Okay'});
+        break;
+        case 'OShape':
+        send({type: 'OShape'});
         break;
         case 'none':
         send({type: 'NONE'});

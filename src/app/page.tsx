@@ -17,11 +17,13 @@ type pointerStyle = {
 
 export default function Home() {
   const newGestureRef = useRef<any>(null);
+  const timeoutRef = useRef<any>(null);
   const [num, setNum] = useState<number>(1);
   const [playVideo, setPlayVideo] = useState<boolean>(false);
   const pointerStyles = useRef<pointerStyle>({display: 'none', left: '0%', top: '0%'});
   const showPointer = useRef<boolean>(false);
   const getPointerVals = useRef<boolean>(false);
+  const captureSlideVals = useRef<boolean>(false);
 
   async function prevSlide() {
     var newNum: number = num - 1;
@@ -50,6 +52,20 @@ export default function Home() {
     }
   }
 
+  async function updateView(pagePercent: number) {
+    localStorage.setItem('captureSlide', JSON.stringify({temp: 'true', percent: pagePercent.toString()}));
+  }
+
+  async function captureSlide(done: boolean) {
+    if (!done) {
+      captureSlideVals.current = true;
+      getPointerVals.current = true;
+    } else {
+      captureSlideVals.current = false;
+      localStorage.setItem('captureSlide', JSON.stringify({temp: 'false', percent: '0'}));
+    }
+  }
+
   async function enablePointer(enable: boolean) {
     showPointer.current = enable;
     viewPointer();
@@ -70,8 +86,13 @@ export default function Home() {
     localStorage.setItem('playPause', newPlayVideo.toString());
   }
 
+  async function timeOut() {
+    timeoutRef.current.resetPreviousGesture();
+  }
+
   useEffect( () => {
     localStorage.setItem('slide', '1');
+    localStorage.setItem('playPause', 'false');
   }, []);
 
   return (
@@ -82,9 +103,9 @@ export default function Home() {
             <header className={styles.title}>Hand Recognition<IconButton style={{position: 'fixed', right: '30px', top: '32px'}} href="/presentation" target="_blank"><OpenInNewIcon style={{height: '100%', color: 'black'}} fontSize="large"/></IconButton></header>
           </Grid>
           <Grid xs={1}>
-            <StateView ref={newGestureRef} nextSlide={nextSlide} prevSlide={prevSlide} enablePointer={enablePointer} toggleVid={toggleVid} toggleMode={toggleMode} playPause={playPause} />
+            <StateView ref={newGestureRef} nextSlide={nextSlide} prevSlide={prevSlide} enablePointer={enablePointer} toggleVid={toggleVid} toggleMode={toggleMode} playPause={playPause} timeOut={timeOut} captureSlide={captureSlide} />
           </Grid>
-          <GestureRecognizer showPointer={showPointer} pointerStyles={pointerStyles} viewPointer={viewPointer} getPointerVals={getPointerVals} newGestureRef={newGestureRef} />
+          <GestureRecognizer ref={timeoutRef} showPointer={showPointer} pointerStyles={pointerStyles} viewPointer={viewPointer} getPointerVals={getPointerVals} newGestureRef={newGestureRef} captureSlideVals={captureSlideVals} updateView={updateView} />
         </Grid>
       </Box>
     </main>
