@@ -17,14 +17,12 @@ const HiddenInput = styled('input')({
 
 export default function SetupView(props: any) {
   const newPDF = (event: any) => {
-    console.log(event);
     if (event.target.files && event.target.files[0]) {
         props.setPdf(event.target.files[0]);
     }
   }
 
   const newVideo = (event: any) => {
-    console.log(event);
     if (event.target.files && event.target.files[0]) {
         props.setVideo(URL.createObjectURL(event.target.files[0]));
     }

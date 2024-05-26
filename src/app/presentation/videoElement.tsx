@@ -15,11 +15,7 @@ const VideoElement = forwardRef((props: any, ref) => {
         video.current!.currentTime += t;
       },
       captureSlide(t: number){
-        console.log("Here5");
-        console.log(video.current!.duration);
         var newTime = video.current!.duration * t;
-        console.log(t);
-        console.log(newTime);
         video.current!.currentTime = newTime;
       }
     }));

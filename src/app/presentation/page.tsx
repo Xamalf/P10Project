@@ -31,11 +31,10 @@ export default function Presentation() {
   async function newCaptureSlide(value: string|null) {
     var captureSlideLocal = JSON.parse(value ?? "{}")
     setCaptureSlide(captureSlideLocal);
-    console.log(captureSlideLocal);
+    
     if (captureSlideLocal.temp == 'true') {
       var percent = parseFloat(captureSlideLocal.percent ?? "0") ?? 0;
-      console.log(percent);
-      console.log(showVideo);
+
       if (showVideo) {
         sendEvent("captureSlide", percent)
       }
@@ -49,8 +48,6 @@ export default function Presentation() {
     setPresentationMode(localStorage.getItem("presentationMode") === "true");
 
     window.onstorage = (ev) => {
-      console.log(ev);
-
       switch (ev.key) {
         case "pointer": setPointerStyles(JSON.parse(ev.newValue ?? "{}")); break;
         case "slide": setPage(parseInt(ev.newValue ?? "1") ?? 1); break;

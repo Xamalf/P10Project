@@ -63,6 +63,7 @@ export default function Home() {
       var newNum: number = Math.ceil(pdfPages.current*pagePercent);
       newNum = newNum < 1 ? 1 : newNum > pdfPages.current ? pdfPages.current : newNum;
       setNum(newNum);
+      localStorage.setItem('captureSlide', JSON.stringify({temp: 'true', percent: '0'}));
       localStorage.setItem('slide', newNum.toString());
     }
   }
@@ -88,7 +89,6 @@ export default function Home() {
 
   async function toggleMode(newPresentationMode: boolean) {
     localStorage.setItem('presentationMode', newPresentationMode.toString());
-    console.log(newPresentationMode.toString())
   }
 
   async function playPause() {
