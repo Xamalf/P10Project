@@ -120,7 +120,7 @@ const Gesture = forwardRef((props: any, ref) => {
     grec.current = await MPHands.GestureRecognizer.createFromOptions(vision.current, {
       numHands: 1,
       runningMode: "VIDEO",
-      customGesturesClassifierOptions: {scoreThreshold: 0.8},
+      customGesturesClassifierOptions: {scoreThreshold: 0.5},
       baseOptions: {
         modelAssetPath: "./gesture_recognizer.task",
         delegate: "GPU",

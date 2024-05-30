@@ -33,7 +33,7 @@ function FileLoader() {
     // Processes the images
     async function processImages() {        
         const startTime = Date.now();
-        for (let folder of ["peace", "pointer"]) {
+        for (let folder of ["Fist", "FourFingersExt", "none", "Okay", "OShape", "Peace", "Pointer", "TwoFingersUp" ]) {
             await performRecognition(folder);
         }
         const EndTime = Date.now();
@@ -43,7 +43,11 @@ function FileLoader() {
     }
 
     async function performRecognition(folderName: string) {
-        for (let i = 1; i <= 3; i++) {
+        let counter = 99;
+        if(folderName === "none") {
+            counter = 693;
+        }
+        for (let i = 1; i <= counter; i++) {
             try {
                 const image = await loadImage("/testData/"+ folderName + "/" + i + '.jpg');
                 if (grec.current) {
