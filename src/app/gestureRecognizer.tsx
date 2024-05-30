@@ -78,7 +78,7 @@ const Gesture = forwardRef((props: any, ref) => {
             var x = (avgx * precision - pointerVals.current[0]) / pointerVals.current[1];
             var y = (avgy * precision - pointerVals.current[2]) / pointerVals.current[3];
 
-            props.pointerStyles.current = {display: 'block', left: (100-x*100).toString() + '%', top: (y*100).toString() + '%'};
+            props.pointerStyles.current = {display: 'block', left: (x*100).toString() + '%', top: (y*100).toString() + '%'};
             props.viewPointer();
             setPointerHistoryX(xHistory);
             setPointerHistoryY(yHistory);
@@ -155,5 +155,7 @@ const Gesture = forwardRef((props: any, ref) => {
     </Grid>
   );
 });
+
+Gesture.displayName = 'Gesture';
 
 export default Gesture;

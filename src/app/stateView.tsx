@@ -81,4 +81,6 @@ const StateView = forwardRef((props: any, ref) => {
   );
 });
 
+StateView.displayName = 'StateView';
+
 export default StateView;
