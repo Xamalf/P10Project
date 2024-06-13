@@ -1,5 +1,5 @@
 "use client";
-import styles from "./gestureRecognizer.module.css";
+import styles from "./camera.module.css";
 import { useRef, useEffect } from "react";
 import { Camera as MPCam } from "@mediapipe/camera_utils";
 
