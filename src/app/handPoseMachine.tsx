@@ -10,88 +10,49 @@ export const handPoseMachineConfig = {
     },
     q_turnon: {
       on: {
-        IShape: 'q_slide'
+        Peace: 'q_slide'
       },
       after: {
-          2000: { target: 'q_off' }
+          2000: { target: 'q_off', actions: 'timeOut' }
       }
     },
 
     q_turnoff: {
       on: {
-          OShape: 'q_off'
+        Peace: 'q_off'
       },
       after: {
-          2000: { target: 'q_slide' }
+          2000: { target: 'q_slide', actions: 'timeOut' }
       }
     },
 
     q_slide: {
       entry: ['presentationMode'],
       on: {
-          IShape: 'q_turnoff',
-          TwoFingersUp: 'q_tovideo',
-          Okay: 'q_cs1',
-          PalmTildedLeft: 'q_next1',
-          PalmTildedRight: 'q_prev1',
+          OShape: 'q_turnoff',
+          Peace: 'q_tovideo',
+          TwoFingersUp: 'q_next1',
+          TwoFingersSide: 'q_prev1',
+          Okay: 'q_moveslider1',
           Pointing: 'q_pointer1'
-      }
-    },
-
-    q_cs1: {
-      on: {
-        Poiting: 'q_cs1',
-        TwoFingersExt: 'q_cs1',
-        ThreeFingersExt: 'q_cs1',
-        FourFingersExt: 'q_cs1',
-        FiveFingersExt: 'q_cs1',
-        Okay: 'q_cs2'
       },
-
       after: {
-        2000: { target: 'q_slide' }
-      }
-    },
-
-    q_cs2: {
-      entry: ['goToSlideNumber'],
-
-      after: {
-        10: { target: 'q_slide' }
+        800: { target: 'q_slide', actions: 'timeOut' }
       }
     },
 
     q_next1: {
       on: {
-        FiveFingersExt: 'q_next2'
+        TwoFingersSide: 'q_next2',
+        Fist: 'q_slide'
         },
 
         after: {
-          2000: { target: 'q_slide' }
+          2000: { target: 'q_slide', actions: 'timeOut' }
         }
     },
 
     q_next2: {
-      on: {
-        PalmTildedRight: 'q_next3'
-        },
-
-        after: {
-          2000: { target: 'q_slide' }
-        }
-    },
-
-    q_next3: {
-      on: {
-        Fist: 'q_next4'
-        },
-
-        after: {
-          2000: { target: 'q_slide' }
-        }
-    },
-
-    q_next4: {
       entry: ['goToNextSlide'],
       
       after: {
@@ -101,35 +62,16 @@ export const handPoseMachineConfig = {
 
     q_prev1: {
       on: {
-        FiveFingersExt: 'q_prev2'
+        TwoFingersUp: 'q_prev2',
+        Fist: 'q_slide'
         },
 
         after: {
-          2000: { target: 'q_slide' }
+          2000: { target: 'q_slide', actions: 'timeOut' }
         }
     },
 
     q_prev2: {
-      on: {
-          PalmTildedLeft: 'q_prev3'
-      },
-
-      after: {
-          2000: { target: 'q_slide' }
-      }
-    },
-
-    q_prev3: {
-      on: {
-          Fist: 'q_prev4'
-      },
-
-      after: {
-          2000: { target: 'q_slide' }
-      }
-    },
-
-    q_prev4: {
       entry: ['goToPrevSlide'],
 
       after: {
@@ -142,175 +84,106 @@ export const handPoseMachineConfig = {
       entry: ['enablePointer'],
 
       on: {
-          Fist: 'q_slide',
-          Pointing: 'q_pointer1'
+          Fist: 'q_slide'
       }
+    },
+
+    q_moveslider1: {
+      entry: ['moveslider'],
+
+      on: {
+          Fist: 'q_movesliderDone1'
+      }
+    },
+
+    q_movesliderDone1: {
+      entry: ['movesliderDone'],
+
+      after: {
+          10: {target: 'q_slide' }
+      }
+      
     },
 
     q_tovideo: {
       on: {
-          TwoFingersSide: 'q_video'
+        FourFingersExt: 'q_video',
+        Fist: 'q_slide'
       },
 
       after: {
-          2000: { target: 'q_slide' }
+          2000: { target: 'q_slide', actions: 'timeOut' }
       }
     },
 
     q_toslide: {
       on: {
-          TwoFingersSide: 'q_slide'
+        FourFingersExt: 'q_slide',
+        Fist: 'q_video'
       },
 
       after: {
-          2000: {target: 'q_video'}
+          2000: {target: 'q_video', actions: 'timeOut' }
       }
     },
 
     q_video: {
       entry: ['videoMode'],
       on: {
-          TwoFingersUp: 'q_toslide',
-          Fist: 'q_playstop',
-          PalmTildedRight: 'q_rev1',
-          PalmTildedLeft: 'q_ff1',
-          Okay: 'q_vid1',
+          Peace: 'q_toslide',
+          OShape: 'q_toplaystop',
+          Okay: 'q_moveslider2',
           Pointing: 'q_pointer2'
+      },
+      after: {
+        800: { target: 'q_video', actions: 'timeOut' }
       }
     },
 
     q_pointer2: {
+      entry: ['enablePointer'],
+
       on: {
           Fist: 'q_video'
       }
     },
 
-    q_vid1: {
+    q_toplaystop: {
       on: {
-          Poiting: 'q_vid1',
-          TwoFingersExt: 'q_vid1',
-          ThreeFingersExt: 'q_vid1',
-          FourFingersExt: 'q_vid1',
-          FiveFingersExt: 'q_vid1',
-          Okay: 'q_vid2'
+          Peace: 'q_playstop',
+          Fist: 'q_video'
       },
 
       after: {
-          2000: {target: 'q_video'}
-      }
-    },
-
-    q_vid2: {
-      entry: ['goToTimestamp'],
-
-      after: {
-          10: {target: 'q_video'}
+          2000: {target: 'q_video', actions: 'timeOut' }
       }
     },
 
     q_playstop: {
-      on: {
-          Peace: 'q_play',
-          FourFingersExt: 'q_stop'
-      },
+      entry: ['playstopVideo'],
 
       after: {
-          2000: {target: 'q_video'}
-      }
-    },
-
-    q_play: {
-      entry: ['playVideo'],
-
-      after: {
-          10: {target: 'q_video'}
+          10: {target: 'q_video' }
       }
       
     },
 
-    q_stop: {
-      entry: ['stopVideo'],
+    q_moveslider2: {
+      entry: ['moveslider'],
 
-      after: {
-          10: {target: 'q_video'}
-      }
-    },
-
-    q_ff1: {
       on: {
-        FiveFingersExt: 'q_ff2'
-      },
-
-      after: {
-          2000: { target: 'q_video' }
+          Fist: 'q_movesliderDone2'
       }
     },
 
-    q_ff2: {
-      on: {
-        PalmTildedRight: 'q_ff3'
-      },
+    q_movesliderDone2: {
+      entry: ['movesliderDone'],
 
       after: {
-          2000: { target: 'q_video' }
+          10: {target: 'q_video' }
       }
+      
     },
-
-    q_ff3: {
-      on: {
-          Fist: 'q_ff4'
-      },
-
-      after: {
-          2000: { target: 'q_video' }
-      }
-    },
-
-    q_ff4: {
-      entry: ['forward_video'],
-
-      after: {
-          10: { target: 'q_video'}
-      }
-    },
-
-    q_rev1: {
-      on: {
-        FiveFingersExt: 'q_rev2'
-      },
-
-      after: {
-          2000: { target: 'q_video' }
-      }
-    },
-
-    q_rev2: {
-      on: {
-          PalmTildedLeft: 'q_rev3'
-      },
-
-      after: {
-          2000: { target: 'q_video' }
-      }
-    },
-
-    q_rev3: {
-      on: {
-          Fist: 'q_rev4'
-      },
-
-      after: {
-          2000: { target: 'q_video' }
-      }
-    },
-
-    q_rev4: {
-      entry: ['rewind_video'],
-
-      after: {
-          10: { target: 'q_video' }
-      }
-    }
   }
 };
 

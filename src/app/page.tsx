@@ -1,13 +1,9 @@
 "use client";
 
 import styles from "./page.module.css";
-import * as MPHands from "@mediapipe/tasks-vision";
 import { useEffect, useRef, useState } from "react";
-import { Camera } from "@mediapipe/camera_utils";
-import { drawLandmarks } from "@mediapipe/drawing_utils";
-import { handPoseMachineConfig } from './handPoseMachine';
-import {createMachine } from 'xstate';
-import { useMachine } from '@xstate/react';
+import StateView from "./stateView";
+import GestureRecognizer from "./gestureRecognizer";
 import Grid from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
@@ -20,274 +16,36 @@ type pointerStyle = {
 }
 
 export default function Home() {
-  const frame = useRef<any>(null);
-  const camera = useRef<Camera|null>(null);
-  const vision = useRef<any>(null);
-  const grec = useRef<MPHands.GestureRecognizer|null>(null);
-  const frameCanvas = useRef<HTMLCanvasElement>(null);
-  const text1 = useRef<HTMLParagraphElement>(null);
-  const text2 = useRef<HTMLParagraphElement>(null);
+  const newGestureRef = useRef<any>(null);
+  const timeoutRef = useRef<any>(null);
   const [num, setNum] = useState<number>(1);
-  const [showVid, setShowVid] = useState<boolean>(false);
-  const [presentationMode, setPresentationMode] = useState<boolean>(false);
+  const [playVideo, setPlayVideo] = useState<boolean>(false);
   const pointerStyles = useRef<pointerStyle>({display: 'none', left: '0%', top: '0%'});
-  const [gestureHistory1stHand, setGestureHistory1stHand] = useState<string[]>(["none", "none", "none", "none", "none"]);
-  const [gestureHistory2ndHand, setGestureHistory2ndHand] = useState<string[]>(["none", "none", "none", "none", "none"]);
-  const previousGesture = useRef<string>("none");
+  const showVideo = useRef<boolean>(false);
   const showPointer = useRef<boolean>(false);
   const getPointerVals = useRef<boolean>(false);
-  const pointerVals = useRef<number[]>([0, 0, 0, 0]);
-  const precision = 10000000;
-
-  const act = {
-    actions: {
-      goToNextSlide: () => {
-        nextSlide();
-      },
-
-      goToPrevSlide: () => {
-        prevSlide();
-      },
-
-      enablePointer: () => {
-        getPointerVals.current = true;
-        showPointer.current = true;
-        viewPointer();
-        console.log('Enable pointer')
-      },
-
-      presentationMode: () => {
-        showPointer.current = false;
-        console.log('Machine enabled');
-        toggleMode(true);
-        toggleVid(false);
-        viewPointer();
-      },
-
-      videoMode: () => {
-        toggleVid(true);
-      },
-
-      machine_disabled: () => {
-          console.log('Machine disabled');
-          toggleMode(false);
-      }, 
-
-      playVideo: () => {
-        play();
-      },
-
-      stopVideo: () => {
-        pause();
-      },
-
-      forward_video: () => {
-        console.log('Forward');
-        forward();
-      },
-
-      rewind_video: () => {
-        console.log('Rewind');
-        rewind();
-      }
-    }
-  }
-
-  const [state, send] = useMachine(createMachine(handPoseMachineConfig, act));
-
-  const cameraSettings = {
-    width: 1280,
-    height: 720,
-  }
-
-  async function setupCamera() {
-    camera.current = new Camera(frame.current!, {onFrame: predictGesture, width: cameraSettings.width, height: cameraSettings.height})
-    camera.current.start();
-  }
-
-  async function predictGesture() {
-    const canvas: CanvasRenderingContext2D = frameCanvas.current!.getContext('2d')!;
-    canvas.save();
-    canvas.clearRect(0, 0, 1280, 720);
-    canvas.drawImage(frame.current, 0, 0, 1280, 720);
-
-    let results: MPHands.GestureRecognizerResult|undefined = grec.current?.recognizeForVideo(frame.current, Date.now());
-
-    if (results) {
-      //console.log(results)
-
-      let isFirst = true;
-
-      if (frameCanvas.current) { 
-        if (results.landmarks) {
-          results.landmarks.forEach((landmarks) => {
-            drawLandmarks(canvas, landmarks, {color: "#ffffff", lineWidth: 1,});
-          })
-  
-        }
-
-        results.gestures.forEach((gesture) => {
-          if(isFirst) {
-            let gestureHistory = gestureHistory1stHand;
-            gestureHistory.shift();
-
-            gestureHistory.push(gesture[0].categoryName);
-
-            //console.log(gestureHistory);
-
-            //console.log(gestureHistory1stHand);
-            //console.log("-------");
-
-            if (gesture[0].categoryName === "Pointing") {
-              var point = results.landmarks[0][4]; 
-              console.log(point.x * precision)
-              console.log(point.y * precision)
-              var x = (point.x * precision - pointerVals.current[0]) / pointerVals.current[1];
-              var y = (point.y * precision - pointerVals.current[2]) / pointerVals.current[3];
-              console.log(pointerVals.current);
-              console.log(x);
-              console.log(y);
-              pointerStyles.current = {display: 'block', left: (x*100).toString() + '%', top: (y*100).toString() + '%'};
-              viewPointer();
-            }
-
-            setGestureHistory1stHand(gestureHistory);
-            text1.current!.innerText = gesture[0].categoryName !== "" ? gesture[0].categoryName : "none";
-            isFirst = false;
-          } else {
-            const [firstGesture, ...restOfGestureHistory ] = gestureHistory2ndHand;
-            setGestureHistory2ndHand([...restOfGestureHistory, gesture[0].categoryName]);
-            text2.current!.innerText = gesture[0].categoryName !== "" ? gesture[0].categoryName : "none";
-
-          }
-
-          //console.log(gesture)
-          
-          //console.log(gesture[0].categoryName);
-
-
-        })
-        let newGesture = gestureHistory1stHand.filter((gesture) => gesture === gestureHistory1stHand[4]).length > 2 ? gestureHistory1stHand[4] : "none";
-
-        if (newGesture == "5FingersExt") {
-          var MiddleFingerTip = results.landmarks[0][12];
-          var Wrist = results.landmarks[0][0];
-
-          var eta = Math.abs(MiddleFingerTip.y - Wrist.y) * 0.1
-
-          if (MiddleFingerTip.x - Wrist.x < -eta) {
-            newGesture = "PalmTildedRight";
-            text1.current!.innerText = "PalmTildedRight";
-          } else if (MiddleFingerTip.x - Wrist.x > (eta * 1.5)) {
-            newGesture = "PalmTildedLeft";
-            text1.current!.innerText = "PalmTildedLeft";
-          }
-        }
-
-        if (getPointerVals.current && newGesture == "Pointing") {
-          var IndexFingerTip = results.landmarks[0][4];
-          var Wrist = results.landmarks[0][0];
-
-          var length = Math.sqrt(Math.pow(IndexFingerTip.x * precision - Wrist.x * precision, 2) + Math.pow(IndexFingerTip.y * precision - Wrist.y * precision, 2));
-          var width = length;
-          var height = length;
-
-          pointerVals.current[0] = IndexFingerTip.x * precision - width;
-          pointerVals.current[1] = width * 2;
-          pointerVals.current[2] = IndexFingerTip.y * precision - height;
-          pointerVals.current[3] = height * 2;
-          getPointerVals.current = false;
-        }
-
-        if(newGesture !== null && newGesture !== "" && newGesture !== "none" && newGesture !== previousGesture.current) {
-          console.log(`new gesture is: ${newGesture}`);
-          console.log(`prev gesture is: ${previousGesture.current}`);
-          previousGesture.current = newGesture;
-
-          switch(newGesture) {     
-            case 'Pointing':
-              send({type: 'Pointing'});
-              break;
-            case '2FingersExt':
-              send({type: 'TwoFingersExt'});
-              break;
-            case '3FingersExt':
-              send({type: 'ThreeFingersExt'});
-              break;
-            case '4FingersExt':
-              send({type: 'FourFingersExt'});
-              break;
-            case '5FingersExt':
-              send({type: 'FiveFingersExt'});
-              break;
-            case 'PalmTildedRight':
-              send({type: 'PalmTildedRight'});
-              break;
-            case 'PalmTildedLeft':
-              send({type: 'PalmTildedLeft'});
-              break;
-            case 'TwoFingersSide':
-              send({type: 'TwoFingersSide'});
-              break;
-            case 'TwoFingersUp':
-              send({type: 'TwoFingersUp'});
-              break;
-            case 'OShape':
-              send({type: 'OShape', context: {num: num, setNum: setNum}});
-              break;
-            case 'IShape':
-              send({type: 'IShape'});
-              break;
-            case 'Fist':
-              send({type: 'Fist'});
-              break;
-            case 'Peace':
-              send({type: 'Peace'});
-              break;
-            case 'none':
-            send({type: 'NONE'});
-            break;
-            default:
-              send({type: 'NONE'});
-              break;
-          }
-        }
-        canvas.restore();
-    }
-    }
-  }
-
-  async function setupHands() {
-    vision.current = await MPHands.FilesetResolver.forVisionTasks(
-      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
-
-    grec.current = await MPHands.GestureRecognizer.createFromOptions(vision.current, {
-      numHands: 2,
-      baseOptions: {
-        modelAssetPath: "./gesture_recognizer.task",
-        delegate: "GPU",
-      },
-    });
-
-    grec.current.setOptions({ runningMode: "VIDEO", numHands: 2, customGesturesClassifierOptions: {scoreThreshold: 0.8} })
-  }
+  const captureSlideVals = useRef<boolean>(false);
+  const pdfPages = useRef<number>(0);
 
   async function prevSlide() {
     var newNum: number = num - 1;
-    setNum(newNum);
-    localStorage.setItem('slide', newNum.toString());
+    if (newNum > 0) {
+      setNum(newNum);
+      localStorage.setItem('slide', newNum.toString());
+    }
   }
 
   async function nextSlide() {
     var newNum: number = num + 1;
-    setNum(newNum);
-    localStorage.setItem('slide', newNum.toString());
+    if (newNum <= pdfPages.current) {
+      setNum(newNum);
+      localStorage.setItem('slide', newNum.toString());
+    }
   }
 
   async function toggleVid(newShowVid: boolean) {
-    setShowVid(newShowVid);
     localStorage.setItem('showVideo', newShowVid.toString());
-    console.log(newShowVid.toString())
+    showVideo.current = newShowVid;
   }
 
   async function viewPointer() {
@@ -298,47 +56,62 @@ export default function Home() {
     }
   }
 
+  async function updateView(pagePercent: number) {
+    if (showVideo.current) {
+      localStorage.setItem('captureSlide', JSON.stringify({temp: 'true', percent: pagePercent.toString()}));
+    } else {
+      var newNum: number = Math.ceil(pdfPages.current*pagePercent);
+      newNum = newNum < 1 ? 1 : newNum > pdfPages.current ? pdfPages.current : newNum;
+      setNum(newNum);
+      localStorage.setItem('captureSlide', JSON.stringify({temp: 'true', percent: '0'}));
+      localStorage.setItem('slide', newNum.toString());
+    }
+  }
+
+  async function captureSlide(done: boolean) {
+    if (!done) {
+      captureSlideVals.current = true;
+      getPointerVals.current = true;
+    } else {
+      captureSlideVals.current = false;
+      localStorage.setItem('captureSlide', JSON.stringify({temp: 'false', percent: '0'}));
+    }
+  }
+
+  async function enablePointer(enable: boolean) {
+    showPointer.current = enable;
+    viewPointer();
+    
+    if (enable) {
+      getPointerVals.current = true;
+    }
+  }
+
   async function toggleMode(newPresentationMode: boolean) {
-    setPresentationMode(newPresentationMode);
     localStorage.setItem('presentationMode', newPresentationMode.toString());
-    console.log(newPresentationMode.toString())
   }
 
-  async function getStoredItems() {
-    setNum(parseInt(localStorage.getItem('slide') ?? "1") ?? 1);
-    setShowVid(localStorage.getItem('showVideo') === "true");
+  async function playPause() {
+    var newPlayVideo = !playVideo;
+    setPlayVideo(newPlayVideo);
+    localStorage.setItem('playPause', newPlayVideo.toString());
   }
 
-  async function rewind() {
-    localStorage.setItem('skip', "-5");
-    localStorage.setItem('skip', "0");
-  }
-
-  async function forward() {
-    localStorage.setItem('skip', "5");
-    localStorage.setItem('skip', "0");
-  }
-
-  async function play() {
-    localStorage.setItem('playPause', "false");
-    localStorage.setItem('playPause', "true");
-  }
-
-  async function pause() {
-    localStorage.setItem('playPause', "false");
+  async function timeOut() {
+    timeoutRef.current.resetPreviousGesture();
   }
 
   useEffect( () => {
-    //getStoredItems();
-    localStorage.setItem('slide', '2');
-    setupCamera();
-    setupHands();
-  }, []);
+    localStorage.setItem('slide', '1');
+    localStorage.setItem('playPause', 'false');
+    pdfPages.current = parseInt(localStorage.getItem("pdfPages") ?? "0") ?? 0;
 
-  const videoConstraints = {
-    width: 1280,
-    height: 720,
-  }
+    window.onstorage = (ev) => {
+      if (ev.key == "pdfPages") {
+        pdfPages.current = parseInt(ev.newValue ?? "0") ?? 0;
+      }
+    }
+  }, []);
 
   return (
     <main className={styles.main}>
@@ -348,30 +121,11 @@ export default function Home() {
             <header className={styles.title}>Hand Recognition<IconButton style={{position: 'fixed', right: '30px', top: '32px'}} href="/presentation" target="_blank"><OpenInNewIcon style={{height: '100%', color: 'black'}} fontSize="large"/></IconButton></header>
           </Grid>
           <Grid xs={1}>
-            <div className={styles.state}>
-              <p>{state.value.toString()}</p>
-            </div>
+            <StateView ref={newGestureRef} nextSlide={nextSlide} prevSlide={prevSlide} enablePointer={enablePointer} toggleVid={toggleVid} toggleMode={toggleMode} playPause={playPause} timeOut={timeOut} captureSlide={captureSlide} />
           </Grid>
-          <Grid justifyContent='center' xs={3}>
-            <Grid alignItems='center' container spacing={2} columns={2}>
-              <Grid xs={2}>
-                <div className={styles.canvasDiv}>
-                  <canvas className={styles.canvas} ref={frameCanvas} width={cameraSettings.width} height={cameraSettings.height}/>
-                </div>
-              </Grid>
-              <Grid xs={1}>
-                <p className={styles.handsign1} ref={text1}>None</p>
-              </Grid>
-              <Grid xs={1}>
-                <p className={styles.handsign2} ref={text2}>None</p>
-              </Grid>
-            </Grid>
-          </Grid>
+          <GestureRecognizer ref={timeoutRef} showPointer={showPointer} pointerStyles={pointerStyles} viewPointer={viewPointer} getPointerVals={getPointerVals} newGestureRef={newGestureRef} captureSlideVals={captureSlideVals} updateView={updateView} />
         </Grid>
       </Box>
-      <div className={styles.hidden}>
-        <video style={{ display: 'none' }} playsInline ref={frame}/>
-      </div>
     </main>
   );
 }

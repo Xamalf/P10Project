@@ -13,6 +13,10 @@ const VideoElement = forwardRef((props: any, ref) => {
       },
       skip(t: number){
         video.current!.currentTime += t;
+      },
+      captureSlide(t: number){
+        var newTime = video.current!.duration * t;
+        video.current!.currentTime = newTime;
       }
     }));
 
@@ -24,5 +28,7 @@ const VideoElement = forwardRef((props: any, ref) => {
       </div>
   );
 });
+
+VideoElement.displayName = 'VideoElement';
 
 export default VideoElement;
